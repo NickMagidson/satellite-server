@@ -1,0 +1,33 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PORT: ${PORT:-3000}
+      UPDATE_INTERVAL_MS: ${UPDATE_INTERVAL_MS:-1000}
+      OMM_FILE: ${OMM_FILE:-/app/data/omm.sample.json}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://satellite:satellite@postgres:5432/satellite}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: satellite
+      POSTGRES_PASSWORD: satellite
+      POSTGRES_DB: satellite
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U satellite -d satellite"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres-data:
