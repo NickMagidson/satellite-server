@@ -1,5 +1,7 @@
 .PHONY: help install dev up down logs clean
 
+COMPOSE_DEV := docker compose -f docker-compose.yml -f docker-compose.dev.yml
+
 .DEFAULT_GOAL := help
 
 help: ## print target descriptions
@@ -8,8 +10,9 @@ help: ## print target descriptions
 install: ## install dependencies
 	npm install
 
-dev: ## run local dev server
-	npm run dev
+dev: ## start dev stack and open api shell
+	$(COMPOSE_DEV) up -d --build
+	$(COMPOSE_DEV) exec api sh
 
 up: ## start docker compose stack (build if needed)
 	docker compose up -d --build

@@ -12,7 +12,7 @@ npm start
 
 By default the server runs on `http://localhost:3000` and loads `data/omm.sample.json`.
 
-For development, run the TypeScript source directly:
+For local host development, run the TypeScript source directly:
 
 ```sh
 npm run dev
@@ -59,6 +59,16 @@ make down
 make logs
 make clean
 ```
+
+`make dev` starts the Docker development stack and opens a shell in the API container. From that shell, run Node commands such as:
+
+```sh
+npm run dev
+npm run build
+npm run typecheck
+```
+
+The API is exposed at `http://localhost:3000`. Inside the dev container, Postgres is reachable at `postgres:5432` with `DATABASE_URL=postgresql://satellite:satellite@postgres:5432/satellite`. This repo does not include a frontend package yet; add a frontend service to `docker-compose.dev.yml` when one exists.
 
 ## OMM JSON Shape
 
