@@ -1,0 +1,26 @@
+{
+  "name": "@satellite-server/api",
+  "version": "1.0.0",
+  "description": "Express API that converts satellite OMM JSON into live geodetic positions.",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "satellite.js": "^7.0.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.1",
+    "nodemon": "^3.1.10",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@satellite-server/db",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo \"No db build yet\"",
+    "dev": "echo \"No db dev task yet\"",
+    "typecheck": "echo \"No db typecheck yet\""
+  }
+}

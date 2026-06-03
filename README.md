@@ -7,10 +7,19 @@ Small Express API that reads satellite OMM JSON, validates each record, converts
 ```sh
 npm install
 npm run build
-npm start
+npm --workspace apps/api start
 ```
 
-By default the server runs on `http://localhost:3000` and loads `data/omm.sample.json`.
+By default the server runs on `http://localhost:3000` and loads `apps/api/data/omm.sample.json`.
+
+## Repo Structure
+
+```txt
+apps/api      Express API
+packages/db   database package scaffold
+```
+
+The root `package.json` uses npm workspaces for `apps/*` and `packages/*`.
 
 For local host development, run the TypeScript source directly:
 
@@ -27,13 +36,13 @@ npm run typecheck
 Use your own OMM file:
 
 ```sh
-OMM_FILE=/absolute/path/to/omms.json npm start
+OMM_FILE=/absolute/path/to/omms.json npm --workspace apps/api start
 ```
 
 Change the update interval:
 
 ```sh
-UPDATE_INTERVAL_MS=1000 npm start
+UPDATE_INTERVAL_MS=1000 npm --workspace apps/api start
 ```
 
 ## Run with Docker Compose
@@ -46,7 +55,7 @@ curl http://localhost:3000/health
 docker compose ps
 ```
 
-The compose setup keeps the current OMM file behavior by defaulting `OMM_FILE` to `/app/data/omm.sample.json` inside the API container. Postgres is available to the API through `DATABASE_URL`, but the app does not connect to it yet.
+The compose setup keeps the current OMM file behavior by defaulting `OMM_FILE` to `/app/apps/api/data/omm.sample.json` inside the API container. Postgres is available to the API through `DATABASE_URL`, but the app does not connect to it yet.
 
 ## Make targets
 
@@ -54,13 +63,15 @@ The compose setup keeps the current OMM file behavior by defaulting `OMM_FILE` t
 make help
 make install
 make dev
+make dev-image
 make up
 make down
 make logs
+make exec
 make clean
 ```
 
-`make dev` starts the Docker development stack and opens a shell in the API container. From that shell, run Node commands such as:
+`make dev` is the primary development entry point. It builds the dev image, starts the Docker development stack, and opens a shell in the API container. From that shell, run Node commands such as:
 
 ```sh
 npm run dev
@@ -68,7 +79,7 @@ npm run build
 npm run typecheck
 ```
 
-The API is exposed at `http://localhost:3000`. Inside the dev container, Postgres is reachable at `postgres:5432` with `DATABASE_URL=postgresql://satellite:satellite@postgres:5432/satellite`. This repo does not include a frontend package yet; add a frontend service to `docker-compose.dev.yml` when one exists.
+The API is exposed at `http://localhost:3000`. Inside the dev container, Postgres is reachable at `postgres:5432` with `DATABASE_URL=postgresql://satellite:satellite@postgres:5432/satellite`. `make up`, `make down`, `make logs`, and `make exec` operate on the same dev stack. This repo does not include a frontend package yet; add a frontend service to `docker-compose.dev.yml` when one exists.
 
 ## OMM JSON Shape
 

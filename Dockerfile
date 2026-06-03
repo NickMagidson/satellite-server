@@ -3,7 +3,7 @@ FROM node:24-alpine AS dev
 ENV NODE_ENV=development \
     PORT=3000 \
     UPDATE_INTERVAL_MS=1000 \
-    OMM_FILE=/app/data/omm.sample.json
+    OMM_FILE=/app/apps/api/data/omm.sample.json
 
 WORKDIR /app
 
@@ -12,11 +12,13 @@ RUN chown node:node /app
 USER node
 
 COPY --chown=node:node package*.json ./
+COPY --chown=node:node apps/api/package.json ./apps/api/package.json
+COPY --chown=node:node packages/db/package.json ./packages/db/package.json
 RUN npm ci
 
-COPY --chown=node:node tsconfig.json ./
-COPY --chown=node:node src ./src
-COPY --chown=node:node data ./data
+COPY --chown=node:node apps/api/tsconfig.json ./apps/api/tsconfig.json
+COPY --chown=node:node apps/api/src ./apps/api/src
+COPY --chown=node:node apps/api/data ./apps/api/data
 
 EXPOSE 3000
 
@@ -31,18 +33,20 @@ FROM node:24-alpine AS runtime
 ENV NODE_ENV=production \
     PORT=3000 \
     UPDATE_INTERVAL_MS=1000 \
-    OMM_FILE=/app/data/omm.sample.json
+    OMM_FILE=/app/apps/api/data/omm.sample.json
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+COPY apps/api/package.json ./apps/api/package.json
+COPY packages/db/package.json ./packages/db/package.json
+RUN npm ci --omit=dev --workspace apps/api && npm cache clean --force
 
-COPY --from=build /app/dist ./dist
-COPY data ./data
+COPY --from=build /app/apps/api/dist ./apps/api/dist
+COPY apps/api/data ./apps/api/data
 
 USER node
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npm", "--workspace", "apps/api", "start"]

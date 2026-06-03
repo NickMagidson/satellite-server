@@ -6,7 +6,7 @@ services:
     environment:
       PORT: ${PORT:-3000}
       UPDATE_INTERVAL_MS: ${UPDATE_INTERVAL_MS:-1000}
-      OMM_FILE: ${OMM_FILE:-/app/data/omm.sample.json}
+      OMM_FILE: ${OMM_FILE:-/app/apps/api/data/omm.sample.json}
       DATABASE_URL: ${DATABASE_URL:-postgresql://satellite:satellite@postgres:5432/satellite}
     ports:
       - "${PORT:-3000}:${PORT:-3000}"

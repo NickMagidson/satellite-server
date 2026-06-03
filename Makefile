@@ -1,28 +1,39 @@
-.PHONY: help install dev up down logs clean
+project_name := satellite-server
 
-COMPOSE_DEV := docker compose -f docker-compose.yml -f docker-compose.dev.yml
+compose_dev := docker compose --project-name=$(project_name) --file="$(CURDIR)/docker-compose.yml" --file="$(CURDIR)/docker-compose.dev.yml"
+
+.PHONY: help install dev dev-image up down logs exec clean
 
 .DEFAULT_GOAL := help
 
 help: ## print target descriptions
-	@awk 'BEGIN {FS = ":.*##"; print "Targets:"} /^[a-zA-Z_-]+:.*##/ {printf "  %-10s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*##"; print "Targets:"} /^[a-zA-Z_-]+:.*##/ {printf "  %-12s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 install: ## install dependencies
 	npm install
 
-dev: ## start dev stack and open api shell
-	$(COMPOSE_DEV) up -d --build
-	$(COMPOSE_DEV) exec api sh
+dev: dev-image up exec ## build/start dev stack and open api shell
 
-up: ## start docker compose stack (build if needed)
-	docker compose up -d --build
+dev-image: ## build development image
+	$(compose_dev) build api
 
-down: ## stop docker compose stack
-	docker compose down
+up: ## start development stack
+	$(compose_dev) up -d
+
+down: ## stop development stack
+	$(compose_dev) down
 
 logs: ## follow compose logs
-	docker compose logs -f
+	$(compose_dev) logs -f
+
+exec: up ## open shell in api container
+	$(compose_dev) exec api sh
 
 clean: ## remove local build/dependency artifacts safely
 	rm -rf node_modules dist .turbo .cache coverage
 	find apps packages -mindepth 2 -maxdepth 2 \( -name node_modules -o -name dist -o -name .turbo -o -name .cache -o -name coverage \) -type d -prune -exec rm -rf {} + 2>/dev/null || true
+
+.EXPORT_ALL_VARIABLES:
+DOCKER_BUILDKIT = 1
+COMPOSE_DOCKER_CLI_BUILD = 1
+COMPOSE_PROJECT_NAME := $(project_name)
