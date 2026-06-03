@@ -6,6 +6,15 @@
   "scripts": {
     "build": "echo \"No db build yet\"",
     "dev": "echo \"No db dev task yet\"",
-    "typecheck": "echo \"No db typecheck yet\""
+    "typecheck": "echo \"No db typecheck yet\"",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.8.0"
+  },
+  "devDependencies": {
+    "prisma": "^7.8.0"
   }
 }

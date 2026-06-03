@@ -81,6 +81,18 @@ npm run typecheck
 
 The API is exposed at `http://localhost:3000`. Inside the dev container, Postgres is reachable at `postgres:5432` with `DATABASE_URL=postgresql://satellite:satellite@postgres:5432/satellite`. `make up`, `make down`, `make logs`, and `make exec` operate on the same dev stack. This repo does not include a frontend package yet; add a frontend service to `docker-compose.dev.yml` when one exists.
 
+## Database Migrations
+
+Prisma lives in `packages/db`. Run migrations from the compose dev container so the default `DATABASE_URL` points at the compose Postgres service:
+
+```sh
+make dev
+npm run db:generate
+npm run db:migrate
+```
+
+Use `npm run db:studio` from the same shell to open Prisma Studio when needed. These commands only manage the database schema; the API still loads OMM records from `OMM_FILE`.
+
 ## OMM JSON Shape
 
 The server accepts:

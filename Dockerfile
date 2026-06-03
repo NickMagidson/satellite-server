@@ -19,6 +19,8 @@ RUN npm ci
 COPY --chown=node:node apps/api/tsconfig.json ./apps/api/tsconfig.json
 COPY --chown=node:node apps/api/src ./apps/api/src
 COPY --chown=node:node apps/api/data ./apps/api/data
+COPY --chown=node:node packages/db/prisma.config.ts ./packages/db/prisma.config.ts
+COPY --chown=node:node packages/db/prisma ./packages/db/prisma
 
 EXPOSE 3000
 

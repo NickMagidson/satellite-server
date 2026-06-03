@@ -8,6 +8,9 @@
   ],
   "scripts": {
     "build": "npm --workspace apps/api run build",
+    "db:generate": "npm --workspace packages/db run prisma:generate",
+    "db:migrate": "npm --workspace packages/db run prisma:migrate",
+    "db:studio": "npm --workspace packages/db run prisma:studio",
     "dev": "npm --workspace apps/api run dev",
     "typecheck": "npm --workspace apps/api run typecheck"
   }
