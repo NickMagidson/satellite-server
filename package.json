@@ -11,7 +11,10 @@
     "db:generate": "npm --workspace packages/db run prisma:generate",
     "db:migrate": "npm --workspace packages/db run prisma:migrate",
     "db:studio": "npm --workspace packages/db run prisma:studio",
-    "dev": "npm --workspace apps/api run dev",
+    "dev": "concurrently -n api,frontend -c blue,green \"npm --workspace apps/api run dev\" \"npm --workspace apps/frontend run dev\"",
     "typecheck": "npm --workspace apps/api run typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
   }
 }

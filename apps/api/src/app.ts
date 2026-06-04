@@ -6,9 +6,10 @@ import type { SatelliteCatalog } from './services/satelliteCatalog.js';
 
 interface CreateAppOptions {
   catalog: SatelliteCatalog;
+  databaseUrl: string | null;
 }
 
-export function createApp({ catalog }: CreateAppOptions): Express {
+export function createApp({ catalog, databaseUrl }: CreateAppOptions): Express {
   const app = express();
 
   app.use(cors());
@@ -24,7 +25,7 @@ export function createApp({ catalog }: CreateAppOptions): Express {
     });
   });
 
-  app.use('/api/satellites', createSatelliteRouter({ catalog }));
+  app.use('/api/satellites', createSatelliteRouter({ catalog, databaseUrl }));
 
   const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     if (res.headersSent) {

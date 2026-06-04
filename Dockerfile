@@ -21,6 +21,7 @@ COPY --chown=node:node apps/api/src ./apps/api/src
 COPY --chown=node:node apps/api/data ./apps/api/data
 COPY --chown=node:node packages/db/prisma.config.ts ./packages/db/prisma.config.ts
 COPY --chown=node:node packages/db/prisma ./packages/db/prisma
+RUN npm run db:generate
 
 EXPOSE 3000
 
@@ -45,6 +46,8 @@ COPY packages/db/package.json ./packages/db/package.json
 RUN npm ci --omit=dev --workspace apps/api && npm cache clean --force
 
 COPY --from=build /app/apps/api/dist ./apps/api/dist
+COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=build /app/node_modules/@prisma/client ./node_modules/@prisma/client
 COPY apps/api/data ./apps/api/data
 
 USER node

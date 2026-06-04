@@ -55,7 +55,7 @@ curl http://localhost:3000/health
 docker compose ps
 ```
 
-The compose setup keeps the current OMM file behavior by defaulting `OMM_FILE` to `/app/apps/api/data/omm.sample.json` inside the API container. Postgres is available to the API through `DATABASE_URL`, but the app does not connect to it yet.
+The compose setup defaults `OMM_FILE` to `/app/apps/api/data/omm.sample.json` inside the API container. On startup, the API loads OMM records from Postgres when rows exist in `omm_records`; otherwise it falls back to `OMM_FILE`.
 
 ## Make targets
 
@@ -91,7 +91,7 @@ npm run db:generate
 npm run db:migrate
 ```
 
-Use `npm run db:studio` from the same shell to open Prisma Studio when needed. These commands only manage the database schema; the API still loads OMM records from `OMM_FILE`.
+Use `npm run db:studio` from the same shell to open Prisma Studio when needed. The API reads existing `omm_records` rows on startup and falls back to `OMM_FILE` when the table is empty.
 
 ## OMM JSON Shape
 

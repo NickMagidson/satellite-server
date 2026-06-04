@@ -1,13 +1,16 @@
 import { Router, type Request, type Response } from 'express';
 import { ValidationError } from '../errors.js';
 import type { SatelliteCatalog } from '../services/satelliteCatalog.js';
+import { loadStoredOmms, saveOmms } from '../services/ommRecordStore.js';
+import { validateAndNormalizeOmms } from '../validation/ommValidation.js';
 import { parseOptionalDate } from '../utils/time.js';
 
 interface CreateSatelliteRouterOptions {
   catalog: SatelliteCatalog;
+  databaseUrl: string | null;
 }
 
-export function createSatelliteRouter({ catalog }: CreateSatelliteRouterOptions): Router {
+export function createSatelliteRouter({ catalog, databaseUrl }: CreateSatelliteRouterOptions): Router {
   const router = Router();
 
   router.get('/', (req, res) => {
@@ -43,15 +46,29 @@ export function createSatelliteRouter({ catalog }: CreateSatelliteRouterOptions)
     }
   });
 
-  router.post('/omms', (req, res, next) => {
+  router.post('/omms', async (req, res, next) => {
     try {
-      const count = catalog.loadOmms(req.body);
-      catalog.start();
+      const validatedOmms = validateAndNormalizeOmms(req.body);
+      
+      if (databaseUrl) {
+        await saveOmms(databaseUrl, validatedOmms);
+        const storedOmms = await loadStoredOmms(databaseUrl);
+        const count = catalog.loadOmms(storedOmms.records);
+        catalog.start();
 
-      res.status(202).json({
-        message: `Loaded ${count} satellite OMM record(s).`,
-        ...catalog.getCurrentSnapshot(),
-      });
+        res.status(202).json({
+          message: `Loaded ${count} satellite OMM record(s).`,
+          ...catalog.getCurrentSnapshot(),
+        });
+      } else {
+        const count = catalog.loadOmms(validatedOmms);
+        catalog.start();
+
+        res.status(202).json({
+          message: `Loaded ${count} satellite OMM record(s) (database not configured).`,
+          ...catalog.getCurrentSnapshot(),
+        });
+      }
     } catch (error) {
       next(error);
     }
