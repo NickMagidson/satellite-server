@@ -2,7 +2,7 @@ project_name := satellite-server
 
 compose_dev := docker compose --project-name=$(project_name) --file="$(CURDIR)/docker-compose.yml" --file="$(CURDIR)/docker-compose.dev.yml"
 
-.PHONY: help install dev dev-image up down logs exec clean
+.PHONY: help install dev dev-image up down logs exec psql clean
 
 .DEFAULT_GOAL := help
 
@@ -12,10 +12,10 @@ help: ## print target descriptions
 install: ## install dependencies
 	npm install
 
-dev: dev-image up exec ## build/start dev stack and open api shell
+dev: dev-image up logs ## build/start dev stack and follow logs
 
 dev-image: ## build development image
-	$(compose_dev) build api
+	$(compose_dev) build api frontend
 
 up: ## start development stack
 	$(compose_dev) up -d
@@ -28,6 +28,9 @@ logs: ## follow compose logs
 
 exec: up ## open shell in api container
 	$(compose_dev) exec api sh
+
+psql: up ## open psql in postgres container
+	$(compose_dev) exec postgres psql -U satellite -d satellite
 
 clean: ## remove local build/dependency artifacts safely
 	rm -rf node_modules dist .turbo .cache coverage

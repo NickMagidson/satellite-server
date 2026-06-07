@@ -71,15 +71,13 @@ make exec
 make clean
 ```
 
-`make dev` is the primary development entry point. It builds the dev image, starts the Docker development stack, and opens a shell in the API container. From that shell, run Node commands such as:
+`make dev` is the primary development entry point. It builds the dev images, starts the Docker development stack, and follows logs for the API and frontend dev servers.
 
 ```sh
-npm run dev
-npm run build
-npm run typecheck
+make dev
 ```
 
-The API is exposed at `http://localhost:3000`. Inside the dev container, Postgres is reachable at `postgres:5432` with `DATABASE_URL=postgresql://satellite:satellite@postgres:5432/satellite`. `make up`, `make down`, `make logs`, and `make exec` operate on the same dev stack. This repo does not include a frontend package yet; add a frontend service to `docker-compose.dev.yml` when one exists.
+The API is exposed at `http://localhost:3000`, and the frontend is exposed at `http://localhost:5173`. Inside the dev containers, Postgres is reachable at `postgres:5432` with `DATABASE_URL=postgresql://satellite:satellite@postgres:5432/satellite`. `make up`, `make down`, `make logs`, and `make exec` operate on the same dev stack. Use `make exec` when you need an interactive shell in the API container.
 
 ## Database Migrations
 
@@ -87,6 +85,7 @@ Prisma lives in `packages/db`. Run migrations from the compose dev container so 
 
 ```sh
 make dev
+make exec
 npm run db:generate
 npm run db:migrate
 ```

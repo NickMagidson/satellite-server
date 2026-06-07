@@ -13,17 +13,19 @@ USER node
 
 COPY --chown=node:node package*.json ./
 COPY --chown=node:node apps/api/package.json ./apps/api/package.json
+COPY --chown=node:node apps/frontend/package.json ./apps/frontend/package.json
 COPY --chown=node:node packages/db/package.json ./packages/db/package.json
 RUN npm ci
 
 COPY --chown=node:node apps/api/tsconfig.json ./apps/api/tsconfig.json
 COPY --chown=node:node apps/api/src ./apps/api/src
 COPY --chown=node:node apps/api/data ./apps/api/data
+COPY --chown=node:node apps/frontend ./apps/frontend
 COPY --chown=node:node packages/db/prisma.config.ts ./packages/db/prisma.config.ts
 COPY --chown=node:node packages/db/prisma ./packages/db/prisma
 RUN npm run db:generate
 
-EXPOSE 3000
+EXPOSE 3000 5173
 
 CMD ["sh"]
 

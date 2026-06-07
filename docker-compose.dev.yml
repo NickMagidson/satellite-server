@@ -2,14 +2,31 @@ services:
   api:
     build:
       target: dev
-    command: sh -c "while true; do sleep 3600; done"
+    command: npm --workspace apps/api run dev
     environment:
       NODE_ENV: development
     volumes:
       - .:/app
-      - api-node-modules:/app/node_modules
+      - node-modules:/app/node_modules
     stdin_open: true
     tty: true
 
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    command: npm --workspace apps/frontend run dev -- --host 0.0.0.0
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      - .:/app
+      - node-modules:/app/node_modules
+    depends_on:
+      - api
+
 volumes:
-  api-node-modules:
+  node-modules:
