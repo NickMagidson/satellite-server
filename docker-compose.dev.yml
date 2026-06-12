@@ -20,6 +20,7 @@ services:
     environment:
       NODE_ENV: development
       VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+      VITE_CESIUM_ION_ACCESS_TOKEN: ${VITE_CESIUM_ION_ACCESS_TOKEN:-}
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     volumes:

@@ -1,58 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
-
-interface GeodeticPosition {
-  latitudeDeg: number
-  longitudeDeg: number
-  altitudeKm: number
-}
-
-interface SatellitePositionOk {
-  id: string
-  name: string
-  status: 'ok'
-  propagatedAt: string
-  geodetic: GeodeticPosition
-}
-
-interface SatellitePositionFailed {
-  id: string
-  name: string
-  status: 'propagation_failed'
-  errorCode: number
-  propagatedAt: string
-}
-
-type SatellitePosition = SatellitePositionOk | SatellitePositionFailed
-
-interface SatelliteSnapshot {
-  updatedAt: string | null
-  propagatedAt: string | null
-  updateIntervalMs: number
-  count: number
-  positions: SatellitePosition[]
-}
-
-async function fetchSatellitePositions(): Promise<SatelliteSnapshot> {
-  const response = await fetch(`${API_BASE}/api/satellites/positions`)
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch satellite positions (${response.status})`)
-  }
-
-  return response.json() as Promise<SatelliteSnapshot>
-}
+import { useSatellitePositions } from '../hooks/useSatellitePositions'
 
 export const Route = createFileRoute('/')({ component: App })
 
 function App() {
-  const { data, isPending, isError, error } = useQuery({
-    queryKey: ['satellite-positions'],
-    queryFn: fetchSatellitePositions,
-    refetchInterval: (query) => query.state.data?.updateIntervalMs ?? 1000,
-  })
+  const { data, isPending, isError, error } = useSatellitePositions()
 
   return (
     <main className="page-wrap px-4 pb-8 pt-14">
@@ -105,7 +57,7 @@ function App() {
             )}
             {!isPending &&
               !isError &&
-              data?.positions.map((position) => (
+              data.positions.map((position) => (
                 <tr
                   key={position.id}
                   className="border-b border-[var(--line)] last:border-b-0"
