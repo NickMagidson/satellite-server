@@ -1,4 +1,16 @@
 services:
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    command: npm run db:migrate:deploy
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://satellite:satellite@postgres:5432/satellite}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   api:
     build:
       context: .
@@ -11,8 +23,8 @@ services:
     ports:
       - "${PORT:-3000}:${PORT:-3000}"
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
   postgres:
     image: postgres:16-alpine

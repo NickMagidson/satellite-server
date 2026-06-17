@@ -15,7 +15,7 @@ install: ## install dependencies
 dev: dev-image up logs ## build/start dev stack and follow logs
 
 dev-image: ## build development image
-	$(compose_dev) build api frontend
+	$(compose_dev) build migrate api frontend
 
 up: ## start development stack
 	$(compose_dev) up -d
