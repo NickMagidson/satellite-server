@@ -2,7 +2,7 @@ project_name := satellite-server
 
 compose_dev := docker compose --project-name=$(project_name) --file="$(CURDIR)/docker-compose.yml" --file="$(CURDIR)/docker-compose.dev.yml"
 
-.PHONY: help install dev dev-image up down logs exec psql clean
+.PHONY: help install dev dev-image up down logs exec psql studio clean
 
 .DEFAULT_GOAL := help
 
@@ -31,6 +31,9 @@ exec: up ## open shell in api container
 
 psql: up ## open psql in postgres container
 	$(compose_dev) exec postgres psql -U satellite -d satellite
+
+studio: up ## open Prisma Studio at http://localhost:5555
+	$(compose_dev) exec api npm run db:studio
 
 clean: ## remove local build/dependency artifacts safely
 	rm -rf node_modules dist .turbo .cache coverage

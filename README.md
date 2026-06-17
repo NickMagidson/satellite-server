@@ -68,6 +68,8 @@ make up
 make down
 make logs
 make exec
+make psql
+make studio
 make clean
 ```
 
@@ -77,7 +79,7 @@ make clean
 make dev
 ```
 
-The API is exposed at `http://localhost:3000`, and the frontend is exposed at `http://localhost:5173`. Inside the dev containers, Postgres is reachable at `postgres:5432` with `DATABASE_URL=postgresql://satellite:satellite@postgres:5432/satellite`. `make up`, `make down`, `make logs`, and `make exec` operate on the same dev stack. Use `make exec` when you need an interactive shell in the API container.
+The API is exposed at `http://localhost:3000`, the frontend is exposed at `http://localhost:5173`, and Prisma Studio is available on demand at `http://localhost:5555` after running `make studio`. Inside the dev containers, Postgres is reachable at `postgres:5432` with `DATABASE_URL=postgresql://satellite:satellite@postgres:5432/satellite`. `make up`, `make down`, `make logs`, `make exec`, `make psql`, and `make studio` operate on the same dev stack. Use `make exec` when you need an interactive shell in the API container.
 
 ## Database Migrations
 
@@ -90,7 +92,7 @@ npm run db:generate
 npm run db:migrate
 ```
 
-Use `npm run db:studio` from the same shell to open Prisma Studio when needed. The API reads existing `omm_records` rows on startup and falls back to `OMM_FILE` when the table is empty.
+Use `make studio` from the repo root to start Prisma Studio, then open `http://localhost:5555`. The API reads existing `omm_records` rows on startup and falls back to `OMM_FILE` when the table is empty.
 
 ## OMM JSON Shape
 

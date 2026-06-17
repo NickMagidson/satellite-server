@@ -5,6 +5,8 @@ services:
     command: npm --workspace apps/api run dev
     environment:
       NODE_ENV: development
+    ports:
+      - "${PRISMA_STUDIO_PORT:-5555}:5555"
     volumes:
       - .:/app
       - node-modules:/app/node_modules
