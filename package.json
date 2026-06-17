@@ -12,6 +12,7 @@
     "db:migrate": "npm --workspace packages/db run prisma:migrate",
     "db:studio": "npm --workspace packages/db run prisma:studio",
     "dev": "concurrently -n api,frontend -c blue,green \"npm --workspace apps/api run dev\" \"npm --workspace apps/frontend run dev\"",
+    "test": "npm --workspace apps/api run test",
     "typecheck": "npm --workspace apps/api run typecheck"
   },
   "devDependencies": {
