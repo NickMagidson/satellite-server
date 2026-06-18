@@ -9,7 +9,7 @@ Safely adjust Cesium viewer behavior, entities, camera, or map-related UI in the
 - **Monorepo layout**
   - `apps/frontend` — TanStack Start + React + Vite + Tailwind (`http://localhost:5173`)
   - `apps/api` — Express API with SGP4 propagation via `satellite.js` (`http://localhost:3000`)
-- **Cesium status**: not installed yet. Add it to `apps/frontend` when introducing the globe viewer.
+- **Cesium**: installed in `apps/frontend` (`cesium` package). Viewer lives in `src/components/CesiumViewer.tsx`; globe route at `src/routes/globe.tsx`.
 - **Likely integration points**
   - New component under `apps/frontend/src/components/` (e.g. `CesiumViewer.tsx`)
   - Route(s) under `apps/frontend/src/routes/` that host the viewer
@@ -25,7 +25,7 @@ Safely adjust Cesium viewer behavior, entities, camera, or map-related UI in the
 
 ### When to use this skill
 
-- The issue focuses on:
+- The task focuses on:
   - camera position, orientation, or movement
   - adding/removing/updating entities, imagery layers, or terrain
   - interaction behavior (click, hover, selection) within the Cesium scene
@@ -49,13 +49,10 @@ Safely adjust Cesium viewer behavior, entities, camera, or map-related UI in the
      - how satellite data is fetched (TanStack Query `queryKey`, `refetchInterval`)
      - which API fields drive entity position (`ecf` vs `geodetic`)
      - how props/state influence the scene
-   - If Cesium is being added for the first time:
-     - install `cesium` in `apps/frontend`
-     - configure Vite for Cesium workers/assets in `apps/frontend/vite.config.ts`
-     - set `VITE_CESIUM_ION_ACCESS_TOKEN` (or equivalent) if using Ion imagery/terrain
+   - Cesium is installed; viewer code is in `CesiumViewer.tsx` with assets via `vite.config.ts` (`cesiumAssetsPlugin`). Cesium is loaded with a **dynamic script tag** (`/cesium/Cesium.js`), not a static import. Set `VITE_CESIUM_ION_ACCESS_TOKEN` for Ion imagery/terrain when needed.
 
 2. **Clarify the requested behavior**
-   - From the issue, extract:
+   - From the task (issue or prompt), extract:
      - what should change in the scene (camera, entities, layers, interaction)
      - whether positions are live (`/positions`) or time-specific (`/positions?at=...`)
      - any performance or UX constraints (smooth animation, initial zoom, number of satellites)
