@@ -15,11 +15,18 @@ By default the server runs on `http://localhost:3000` and loads `apps/api/data/o
 ## Repo Structure
 
 ```txt
-apps/api      Express API
-packages/db   database package scaffold
+apps/api        Express API — OMM ingest, SGP4 propagation, REST
+apps/frontend   TanStack Start + React — table UI, Cesium globe
+packages/db     Prisma + Postgres (omm_records)
 ```
 
 The root `package.json` uses npm workspaces for `apps/*` and `packages/*`.
+
+## Documentation
+
+**AI assistants (Copilot, Cursor):** start at [`.github/copilot-instructions.md`](./.github/copilot-instructions.md).
+
+**Contributors:** workflow, architecture, and skills live in [`docs/`](./docs/README.md). Human setup and API reference remain in this file.
 
 For local host development, run the TypeScript source directly:
 
@@ -55,7 +62,7 @@ curl http://localhost:3000/health
 docker compose ps
 ```
 
-The compose setup defaults `OMM_FILE` to `/app/apps/api/data/omm.sample.json` inside the API container. On startup, the API loads OMM records from Postgres when rows exist in `omm_records`; otherwise it falls back to `OMM_FILE`.
+The compose setup defaults `OMM_FILE` to `/app/apps/api/data/omm.sample.json` inside the API container. On startup, the API loads OMM records from Postgres when rows exist in `omm_records`; when the database is configured but empty, it seeds from `OMM_FILE` first; otherwise it reads `OMM_FILE` directly. See [`docs/DECISIONS.md`](./docs/DECISIONS.md) for the full load sequence.
 
 ## Make targets
 
@@ -178,6 +185,6 @@ POST /api/satellites/omms
 }
 ```
 
-`POST /api/satellites/omms` lets a front end replace the active OMM set at runtime by sending one of the accepted OMM JSON shapes.
+`POST /api/satellites/omms` lets a front end replace the active OMM set at runtime by sending one of the accepted OMM JSON shapes. Returns **202 Accepted** with a message and the current position snapshot.
 
 Invalid OMM payloads return `400` with structured validation details.
