@@ -108,7 +108,7 @@ export default function SearchInput<TOption>({
                   <div>
                     <div>{getOptionLabel(option)}</div>
                     {getOptionDescription ? (
-                      <div className="text-xs text-slate-500">
+                      <div className="font-mono text-xs text-slate-500 tabular-nums">
                         {getOptionDescription(option)}
                       </div>
                     ) : null}

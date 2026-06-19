@@ -57,6 +57,9 @@ function App() {
             <span className="font-medium text-slate-950">
               {selectedSatellite.name}
             </span>
+            <span className="mt-1 block font-mono text-xs text-slate-500 tabular-nums">
+              NORAD {selectedSatellite.noradCatId} · {selectedSatellite.id}
+            </span>
           </div>
         ) : null}
       </section>

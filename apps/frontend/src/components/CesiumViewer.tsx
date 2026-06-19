@@ -172,7 +172,7 @@ export default function CesiumViewer({ positions, className }: CesiumViewerProps
             },
             label: {
               text: position.name,
-              font: '12px Manrope, sans-serif',
+              font: '12px "IBM Plex Sans", sans-serif',
               fillColor: Cesium.Color.WHITE,
               outlineColor: Cesium.Color.BLACK,
               outlineWidth: 2,
