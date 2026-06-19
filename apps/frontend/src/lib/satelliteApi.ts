@@ -39,6 +39,33 @@ export interface SatelliteSnapshot {
   positions: SatellitePosition[]
 }
 
+export interface SatelliteMetadata {
+  id: string
+  name: string
+  noradCatId: string | number
+  objectId: string | null
+  epoch: string
+  classification: string | null
+  meanMotion: number
+  inclinationDeg: number
+  eccentricity: number
+}
+
+export interface SatelliteCatalog {
+  count: number
+  satellites: SatelliteMetadata[]
+}
+
+export async function fetchSatellites(): Promise<SatelliteCatalog> {
+  const response = await fetch(`${API_BASE}/api/satellites`)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch satellites (${response.status})`)
+  }
+
+  return response.json() as Promise<SatelliteCatalog>
+}
+
 export async function fetchSatellitePositions(): Promise<SatelliteSnapshot> {
   const response = await fetch(`${API_BASE}/api/satellites/positions`)
 
