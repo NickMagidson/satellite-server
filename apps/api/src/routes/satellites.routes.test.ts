@@ -43,6 +43,9 @@ describe('satellite routes', () => {
           id: '25544',
           name: 'ISS SAMPLE',
           noradCatId: 25544,
+          orbitClass: 'LEO',
+          objectType: 'PAYLOAD',
+          countryCode: 'US',
         }),
       ],
     });

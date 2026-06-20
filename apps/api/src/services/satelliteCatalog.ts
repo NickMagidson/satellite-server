@@ -4,6 +4,7 @@ import { propagateSatellite } from './propagationService.js';
 import { validateAndNormalizeOmms } from '../validation/ommValidation.js';
 import type {
   NormalizedOmmRecord,
+  OrbitClass,
   SatelliteEntry,
   SatelliteMetadata,
   SatellitePosition,
@@ -29,6 +30,50 @@ function getSatelliteName(omm: NormalizedOmmRecord, id: string): string {
   return String(omm.OBJECT_NAME ?? omm.OBJECT_ID ?? id);
 }
 
+function getNullableString(value: unknown): string | null {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  return String(value);
+}
+
+function getNullableNumber(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : null;
+}
+
+function getOrbitalPeriodMin(omm: NormalizedOmmRecord): number {
+  return getNullableNumber(omm.PERIOD) ?? 1440 / omm.MEAN_MOTION;
+}
+
+function classifyOrbit(omm: NormalizedOmmRecord): OrbitClass {
+  const eccentricity = omm.ECCENTRICITY;
+  const periodMin = getOrbitalPeriodMin(omm);
+
+  if (eccentricity >= 0.25) {
+    return 'HEO';
+  }
+
+  if (periodMin < 128) {
+    return 'LEO';
+  }
+
+  if (periodMin >= 1300 && periodMin <= 1600) {
+    return 'GEO';
+  }
+
+  if (periodMin > 0) {
+    return 'MEO';
+  }
+
+  return 'OTHER';
+}
+
 function toMetadata(entry: SatelliteEntry): SatelliteMetadata {
   return {
     id: entry.id,
@@ -40,6 +85,15 @@ function toMetadata(entry: SatelliteEntry): SatelliteMetadata {
     meanMotion: entry.omm.MEAN_MOTION,
     inclinationDeg: entry.omm.INCLINATION,
     eccentricity: entry.omm.ECCENTRICITY,
+    orbitClass: classifyOrbit(entry.omm),
+    objectType: getNullableString(entry.omm.OBJECT_TYPE),
+    countryCode: getNullableString(entry.omm.COUNTRY_CODE),
+    launchDate: getNullableString(entry.omm.LAUNCH_DATE),
+    launchSite: getNullableString(entry.omm.SITE),
+    rcsSize: getNullableString(entry.omm.RCS_SIZE),
+    periodMin: getOrbitalPeriodMin(entry.omm),
+    apoapsisKm: getNullableNumber(entry.omm.APOAPSIS),
+    periapsisKm: getNullableNumber(entry.omm.PERIAPSIS),
   };
 }
 

@@ -1,14 +1,9 @@
 import { useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { fetchSatellites } from '../lib/satelliteApi'
 import type { SatelliteMetadata } from '../lib/satelliteApi'
+import { useSatellites } from './useSatellites'
 
 export function useSatelliteSearch(query: string, limit = 8) {
-  const satellitesQuery = useQuery({
-    queryKey: ['satellites'],
-    queryFn: fetchSatellites,
-    staleTime: 60_000,
-  })
+  const satellitesQuery = useSatellites()
 
   const results = useMemo(() => {
     const search = query.trim().toLowerCase()

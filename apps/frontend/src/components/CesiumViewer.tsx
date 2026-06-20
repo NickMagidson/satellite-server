@@ -10,6 +10,7 @@ interface CesiumEntity {
 interface CesiumViewerInstance {
   entities: {
     add: (options: Record<string, unknown>) => CesiumEntity
+    remove: (entity: CesiumEntity) => boolean
   }
   destroy: () => void
 }
@@ -149,6 +150,14 @@ export default function CesiumViewer({ positions, className }: CesiumViewerProps
 
       const Cesium = await loadCesium()
       const entities = entitiesRef.current
+      const visibleIds = new Set(positions.map((position) => position.id))
+
+      for (const [id, entity] of entities) {
+        if (!visibleIds.has(id)) {
+          viewer.entities.remove(entity)
+          entities.delete(id)
+        }
+      }
 
       for (const position of positions) {
         const { xKm, yKm, zKm } = position.ecf

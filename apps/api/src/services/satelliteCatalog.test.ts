@@ -20,7 +20,34 @@ describe('SatelliteCatalog', () => {
         noradCatId: 25544,
         objectId: '1998-067A',
         classification: 'U',
+        orbitClass: 'LEO',
+        objectType: 'PAYLOAD',
+        countryCode: 'US',
+        launchDate: '1998-11-20',
+        launchSite: 'TYMSC',
+        rcsSize: 'LARGE',
+        periodMin: 92.902,
+        apoapsisKm: 424.75,
+        periapsisKm: 415.25,
       }),
+    ]);
+  });
+
+  it('derives orbit classes from GP orbital fields', () => {
+    const catalog = new SatelliteCatalog({ updateIntervalMs: 1000 });
+
+    catalog.loadOmms([
+      { ...validOmm, NORAD_CAT_ID: 1, MEAN_MOTION: 15.5, ECCENTRICITY: 0.001, PERIOD: undefined },
+      { ...validOmm, NORAD_CAT_ID: 2, MEAN_MOTION: 2.0, ECCENTRICITY: 0.001, PERIOD: undefined },
+      { ...validOmm, NORAD_CAT_ID: 3, MEAN_MOTION: 1.0027, ECCENTRICITY: 0.001, PERIOD: undefined },
+      { ...validOmm, NORAD_CAT_ID: 4, MEAN_MOTION: 2.0, ECCENTRICITY: 0.7, PERIOD: undefined },
+    ]);
+
+    expect(catalog.getSatellites().map((satellite) => satellite.orbitClass)).toEqual([
+      'LEO',
+      'MEO',
+      'GEO',
+      'HEO',
     ]);
   });
 

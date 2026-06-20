@@ -41,6 +41,8 @@ export interface SatelliteEntry {
   satrec: SatRec;
 }
 
+export type OrbitClass = 'LEO' | 'MEO' | 'GEO' | 'HEO' | 'OTHER';
+
 export interface SatelliteMetadata {
   id: string;
   name: string;
@@ -51,6 +53,15 @@ export interface SatelliteMetadata {
   meanMotion: number;
   inclinationDeg: number;
   eccentricity: number;
+  orbitClass: OrbitClass;
+  objectType: string | null;
+  countryCode: string | null;
+  launchDate: string | null;
+  launchSite: string | null;
+  rcsSize: string | null;
+  periodMin: number | null;
+  apoapsisKm: number | null;
+  periapsisKm: number | null;
 }
 
 export interface VectorKm {
