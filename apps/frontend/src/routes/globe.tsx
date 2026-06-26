@@ -1,6 +1,6 @@
 import { Transition } from '@headlessui/react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Fragment, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import CesiumViewer from '../components/CesiumViewer'
 import GlobeFilters from '../components/globe/GlobeFilters'
 import SatelliteDetailPanel from '../components/globe/SatelliteDetailPanel'
@@ -82,7 +82,7 @@ function GlobePage() {
 
   return (
     <main className="globe-main relative w-full overflow-hidden bg-slate-950">
-      <div className="absolute left-4 top-4 z-10 flex items-start gap-2">
+      <div className="absolute left-4 top-4 z-10 flex items-stretch gap-2">
         <SearchInput
           className="w-80"
           inputClassName="rounded-full border-white/20 shadow-lg focus-visible:ring-white/80"
@@ -128,7 +128,6 @@ function GlobePage() {
         </p>
       )}
       <Transition
-        as={Fragment}
         show={Boolean(selectedSatellite)}
         enter="transition ease-out duration-200"
         enterFrom="opacity-0 translate-x-4"
@@ -137,8 +136,8 @@ function GlobePage() {
         leaveFrom="opacity-100 translate-x-0"
         leaveTo="opacity-0 translate-x-4"
       >
-        {selectedSatellite ? (
-          <div className="absolute right-4 top-4 z-10 w-80 transform">
+        <div className="absolute right-4 top-4 z-10 w-80 transform">
+          {selectedSatellite ? (
             <SatelliteDetailPanel
               satellite={selectedSatellite}
               position={selectedSatellitePosition}
@@ -147,8 +146,8 @@ function GlobePage() {
                 setQuery('')
               }}
             />
-          </div>
-        ) : null}
+          ) : null}
+        </div>
       </Transition>
       <CesiumViewer
         positions={filteredPositions}

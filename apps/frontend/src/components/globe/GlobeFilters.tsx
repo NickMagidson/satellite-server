@@ -94,11 +94,13 @@ export default function GlobeFilters({
   const activeFilterCount = countActiveFilters(filters)
 
   return (
-    <Popover className="relative">
+    <Popover className="relative self-stretch">
       <PopoverButton
         className={cx(
-          'inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-lg transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80',
-          activeFilterCount > 0 && 'border-cyan-300 text-slate-950',
+          'flex h-full items-center justify-center gap-2 rounded-lg border border-white/20 bg-white text-sm font-medium text-slate-800 shadow-lg transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80',
+          activeFilterCount > 0
+            ? 'border-cyan-300 px-3 text-slate-950'
+            : 'aspect-square',
         )}
       >
         <ListFilter className="size-4" aria-hidden="true" />
@@ -110,7 +112,10 @@ export default function GlobeFilters({
         ) : null}
       </PopoverButton>
 
-      <PopoverPanel className="mt-3 w-80 rounded-xl border border-slate-200 bg-white p-3 text-slate-950 shadow-xl">
+      <PopoverPanel
+        anchor="bottom start"
+        className="z-30 w-80 rounded-xl border border-slate-200 bg-white p-3 text-slate-950 shadow-xl [--anchor-gap:0.75rem]"
+      >
         <div className="flex items-start justify-between gap-3 border-b border-slate-200 pb-3">
           <div>
             <h2 className="text-sm font-semibold">Globe filters</h2>
