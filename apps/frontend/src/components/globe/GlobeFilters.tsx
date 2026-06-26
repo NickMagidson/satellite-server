@@ -1,5 +1,5 @@
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { Filter } from 'lucide-react'
+import { ListFilter } from 'lucide-react'
 import type { OrbitClass } from '../../lib/satelliteApi'
 import {
   countActiveFilters,
@@ -97,12 +97,12 @@ export default function GlobeFilters({
     <Popover className="relative">
       <PopoverButton
         className={cx(
-          'inline-flex items-center gap-2 rounded-full border border-white/20 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-lg transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80',
+          'inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-lg transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80',
           activeFilterCount > 0 && 'border-cyan-300 text-slate-950',
         )}
       >
-        <Filter className="size-4" aria-hidden="true" />
-        Filters
+        <ListFilter className="size-4" aria-hidden="true" />
+        <span className="sr-only">Filters</span>
         {activeFilterCount > 0 ? (
           <span className="rounded-full bg-slate-950 px-1.5 py-0.5 text-xs text-white">
             {activeFilterCount}

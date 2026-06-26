@@ -1,20 +1,22 @@
+import { Transition } from '@headlessui/react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import CesiumViewer from '../components/CesiumViewer'
 import GlobeFilters from '../components/globe/GlobeFilters'
+import SatelliteDetailPanel from '../components/globe/SatelliteDetailPanel'
 import SearchInput from '../components/search/SearchInput'
 import { useSatellitePositions } from '../hooks/useSatellitePositions'
 import { useSatelliteSearch } from '../hooks/useSatelliteSearch'
 import { useSatellites } from '../hooks/useSatellites'
-import { isSatellitePositionOk } from '../lib/satelliteApi'
-import type { SatelliteMetadata } from '../lib/satelliteApi'
+import type { GlobeFiltersState } from '../lib/globeFilters'
 import {
   DEFAULT_GLOBE_FILTERS,
   ORBIT_CLASS_LABELS,
   buildFilterOptions,
   filterSatellitePositions,
 } from '../lib/globeFilters'
-import type { GlobeFiltersState } from '../lib/globeFilters'
+import type { SatelliteMetadata } from '../lib/satelliteApi'
+import { isSatellitePositionOk } from '../lib/satelliteApi'
 
 export const Route = createFileRoute('/globe')({ component: GlobePage })
 
@@ -55,6 +57,13 @@ function GlobePage() {
     [satellites],
   )
   const dataError = error ?? satellitesQuery.error
+  const selectedSatellitePosition = useMemo(
+    () =>
+      selectedSatellite
+        ? filteredPositions.find((position) => position.id === selectedSatellite.id)
+        : null,
+    [filteredPositions, selectedSatellite],
+  )
 
   function handleSelectedEntityIdChange(entityId: string | null) {
     if (!entityId) {
@@ -118,6 +127,29 @@ function GlobePage() {
             : 'Failed to load satellite data.'}
         </p>
       )}
+      <Transition
+        as={Fragment}
+        show={Boolean(selectedSatellite)}
+        enter="transition ease-out duration-200"
+        enterFrom="opacity-0 translate-x-4"
+        enterTo="opacity-100 translate-x-0"
+        leave="transition ease-in duration-150"
+        leaveFrom="opacity-100 translate-x-0"
+        leaveTo="opacity-0 translate-x-4"
+      >
+        {selectedSatellite ? (
+          <div className="absolute right-4 top-4 z-10 w-80 transform">
+            <SatelliteDetailPanel
+              satellite={selectedSatellite}
+              position={selectedSatellitePosition}
+              onClose={() => {
+                setSelectedSatellite(null)
+                setQuery('')
+              }}
+            />
+          </div>
+        ) : null}
+      </Transition>
       <CesiumViewer
         positions={filteredPositions}
         selectedEntityId={selectedSatellite?.id ?? null}

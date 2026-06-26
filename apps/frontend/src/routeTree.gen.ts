@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UiTestRouteImport } from './routes/ui-test'
 import { Route as GlobeRouteImport } from './routes/globe'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const UiTestRoute = UiTestRouteImport.update({
+  id: '/ui-test',
+  path: '/ui-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GlobeRoute = GlobeRouteImport.update({
   id: '/globe',
   path: '/globe',
@@ -33,34 +39,45 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/globe': typeof GlobeRoute
+  '/ui-test': typeof UiTestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/globe': typeof GlobeRoute
+  '/ui-test': typeof UiTestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/globe': typeof GlobeRoute
+  '/ui-test': typeof UiTestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/globe'
+  fullPaths: '/' | '/about' | '/globe' | '/ui-test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/globe'
-  id: '__root__' | '/' | '/about' | '/globe'
+  to: '/' | '/about' | '/globe' | '/ui-test'
+  id: '__root__' | '/' | '/about' | '/globe' | '/ui-test'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   GlobeRoute: typeof GlobeRoute
+  UiTestRoute: typeof UiTestRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/ui-test': {
+      id: '/ui-test'
+      path: '/ui-test'
+      fullPath: '/ui-test'
+      preLoaderRoute: typeof UiTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/globe': {
       id: '/globe'
       path: '/globe'
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   GlobeRoute: GlobeRoute,
+  UiTestRoute: UiTestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -41,6 +41,13 @@ export default function AppHeader() {
               >
                 Globe
               </Link>
+              <Link
+                to="/ui-test"
+                className={navLinkClass}
+                activeProps={{ className: activeNavLinkClass }}
+              >
+                UI Test
+              </Link>
             </div>
 
             <div className="ml-auto flex items-center gap-2">
@@ -73,6 +80,14 @@ export default function AppHeader() {
                 onClick={() => close()}
               >
                 Globe
+              </Link>
+              <Link
+                to="/ui-test"
+                className={mobileNavLinkClass}
+                activeProps={{ className: activeMobileNavLinkClass }}
+                onClick={() => close()}
+              >
+                UI Test
               </Link>
             </div>
           </DisclosurePanel>
