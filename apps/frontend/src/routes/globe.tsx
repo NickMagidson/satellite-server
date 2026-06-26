@@ -38,15 +38,6 @@ function GlobePage() {
     () => filterSatellitePositions(okPositions, satellitesById, filters),
     [filters, okPositions, satellitesById],
   )
-  const visiblePositions = useMemo(() => {
-    if (!selectedSatellite) {
-      return filteredPositions
-    }
-
-    return filteredPositions.filter(
-      (position) => position.id === selectedSatellite.id,
-    )
-  }, [filteredPositions, selectedSatellite])
   const orbitOptions = useMemo(
     () =>
       buildFilterOptions(
@@ -64,6 +55,21 @@ function GlobePage() {
     [satellites],
   )
   const dataError = error ?? satellitesQuery.error
+
+  function handleSelectedEntityIdChange(entityId: string | null) {
+    if (!entityId) {
+      setSelectedSatellite(null)
+      setQuery('')
+      return
+    }
+
+    const satellite = satellitesById.get(entityId) ?? null
+    const position = filteredPositions.find(
+      (candidate) => candidate.id === entityId,
+    )
+    setSelectedSatellite(satellite)
+    setQuery(satellite?.name ?? position?.name ?? '')
+  }
 
   return (
     <main className="globe-main relative w-full overflow-hidden bg-slate-950">
@@ -99,7 +105,7 @@ function GlobePage() {
           orbitOptions={orbitOptions}
           objectTypeOptions={objectTypeOptions}
           countryOptions={countryOptions}
-          resultCount={visiblePositions.length}
+          resultCount={filteredPositions.length}
           totalCount={okPositions.length}
           onChange={setFilters}
         />
@@ -112,7 +118,12 @@ function GlobePage() {
             : 'Failed to load satellite data.'}
         </p>
       )}
-      <CesiumViewer positions={visiblePositions} className="h-full w-full" />
+      <CesiumViewer
+        positions={filteredPositions}
+        selectedEntityId={selectedSatellite?.id ?? null}
+        onSelectedEntityIdChange={handleSelectedEntityIdChange}
+        className="h-full w-full"
+      />
       {(isPending || satellitesQuery.isPending) && (
         <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md bg-white px-3 py-2 text-sm text-slate-600 shadow-sm">
           {isPending
@@ -120,9 +131,9 @@ function GlobePage() {
             : 'Loading satellite catalog...'}
         </p>
       )}
-      {!isPending && !satellitesQuery.isPending && visiblePositions.length === 0 ? (
+      {!isPending && !satellitesQuery.isPending && filteredPositions.length === 0 ? (
         <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md bg-white px-3 py-2 text-sm text-slate-600 shadow-sm">
-          No satellites match the selected search and filters.
+          No satellites match the selected filters.
         </p>
       ) : null}
     </main>
