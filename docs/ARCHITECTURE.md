@@ -8,7 +8,7 @@ Structure of the Satellite Server monorepo and how data flows through it.
 satellite-server-monorepo/
 ├── apps/
 │   ├── api/           Express 5 API — OMM ingest, SGP4, position cache
-│   └── frontend/      TanStack Start + React — table UI, Cesium globe
+│   └── frontend/      TanStack Start + React — Cesium globe
 ├── packages/
 │   └── db/            Prisma schema + migrations (Postgres)
 ├── docker-compose.yml         Production-oriented compose (api + postgres)
@@ -51,9 +51,9 @@ TanStack Start + React 19 + Vite + Tailwind 4 + Cesium.
 
 | Directory | Responsibility |
 |-----------|----------------|
-| `src/routes/` | File-based TanStack Router (`/`, `/about`, `/globe`) |
-| `src/components/` | Header, Footer, CesiumViewer, ThemeToggle |
-| `src/hooks/` | `useSatellitePositions` (TanStack Query) |
+| `src/routes/` | File-based TanStack Router (`/` — globe page) |
+| `src/components/` | CesiumViewer, SearchInput, SatelliteDetailPanel |
+| `src/hooks/` | `useSatellitePositions`, `useSatellites`, `useSatelliteSearch` |
 | `src/lib/` | `satelliteApi.ts` — fetch wrapper + types |
 | `vite.config.ts` | TanStack Start, Tailwind, Cesium asset plugin |
 

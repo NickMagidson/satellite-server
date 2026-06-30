@@ -6,10 +6,6 @@
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
-:root {
-  --app-header-height: 4rem;
-}
-
 html,
 body,
 #app {
@@ -27,5 +23,5 @@ body {
 }
 
 .globe-main {
-  height: calc(100dvh - var(--app-header-height));
+  height: 100dvh;
 }

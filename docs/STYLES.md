@@ -78,7 +78,7 @@ src/
 
 | Kind | Convention | Example |
 |------|------------|---------|
-| Components | PascalCase file + export | `CesiumViewer.tsx`, `ThemeToggle.tsx` |
+| Components | PascalCase file + export | `CesiumViewer.tsx`, `GlobeFilters.tsx` |
 | Hooks | `use` prefix | `useSatellitePositions` |
 | Route files | kebab or index | `globe.tsx`, `index.tsx`, `__root.tsx` |
 | Props interfaces | `ComponentNameProps` | `CesiumViewerProps` |

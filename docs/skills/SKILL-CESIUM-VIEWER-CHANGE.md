@@ -9,7 +9,7 @@ Safely adjust Cesium viewer behavior, entities, camera, or map-related UI in the
 - **Monorepo layout**
   - `apps/frontend` — TanStack Start + React + Vite + Tailwind (`http://localhost:5173`)
   - `apps/api` — Express API with SGP4 propagation via `satellite.js` (`http://localhost:3000`)
-- **Cesium**: installed in `apps/frontend` (`cesium` package). Viewer lives in `src/components/CesiumViewer.tsx`; globe route at `src/routes/globe.tsx`.
+- **Cesium**: installed in `apps/frontend` (`cesium` package). Viewer lives in `src/components/CesiumViewer.tsx`; the globe page is at `src/routes/index.tsx` (`/`).
 - **Likely integration points**
   - New component under `apps/frontend/src/components/` (e.g. `CesiumViewer.tsx`)
   - Route(s) under `apps/frontend/src/routes/` that host the viewer
@@ -34,7 +34,7 @@ Safely adjust Cesium viewer behavior, entities, camera, or map-related UI in the
 
 ### When *not* to use this skill
 
-- For general page layout or non-map UI (headers, tables, theme toggle) — edit `apps/frontend/src/components/` and route files directly.
+- For general page layout or non-map UI (search overlay, detail panel) — edit `apps/frontend/src/components/` and `src/routes/index.tsx`.
 - For API propagation logic, OMM validation, or catalog changes — work in `apps/api`.
 - For orbital mechanics concepts (TLE, OMM, SGP4, frames) — see `SKILL-SATELLITE-PROPAGATION-BASICS.md`.
 
@@ -81,15 +81,15 @@ Safely adjust Cesium viewer behavior, entities, camera, or map-related UI in the
 
 5. **Coordinate with API and UI when needed**
    - If new position fields or endpoints are required, update `apps/api` routes/types first, then consume them in the frontend.
-   - If surrounding UI (panels, tables, filters) must change, update the route and shared components in `apps/frontend/src/`.
+   - If surrounding UI (search, detail panel) must change, update `src/routes/index.tsx` and shared components in `apps/frontend/src/`.
 
 6. **Manual verification (recommended)**
    - From the repo root, run `npm run dev` (starts API on `:3000` and frontend on `:5173`).
-   - Open the page that hosts the Cesium viewer.
+   - Open `/` (the globe page).
    - Verify:
      - the viewer initializes without console errors
-     - satellite entities align with the table data on `/` (or the relevant route)
-     - live polling updates entity positions at the expected interval
+     - satellite entities appear and update with live polling
+     - search and click-to-select open the detail panel with correct metadata
      - performance remains acceptable with the current satellite count
 
 7. **Run validation**

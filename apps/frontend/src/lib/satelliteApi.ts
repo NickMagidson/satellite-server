@@ -41,6 +41,14 @@ export interface SatelliteSnapshot {
 
 export type OrbitClass = 'LEO' | 'MEO' | 'GEO' | 'HEO' | 'OTHER'
 
+export const ORBIT_CLASS_LABELS: Record<OrbitClass, string> = {
+  LEO: 'Low Earth Orbit',
+  MEO: 'Medium Earth Orbit',
+  GEO: 'Geosynchronous',
+  HEO: 'Highly Elliptical',
+  OTHER: 'Other',
+}
+
 export interface SatelliteMetadata {
   id: string
   name: string

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { GLOBE_START_VIEW } from '../lib/cesiumCamera'
 import type { SatellitePositionOk } from '../lib/satelliteApi'
 
 interface CesiumEntity {
@@ -43,7 +44,12 @@ interface CesiumPointPrimitiveCollection {
   remove: (primitive: CesiumPointPrimitive) => boolean
 }
 
+interface CesiumCamera {
+  setView: (options: Record<string, unknown>) => void
+}
+
 interface CesiumViewerInstance {
+  camera: CesiumCamera
   scene: CesiumScene
   screenSpaceEventHandler: {
     setInputAction: (
@@ -64,9 +70,13 @@ interface CesiumNamespace {
     element: HTMLElement,
     options: Record<string, unknown>,
   ) => CesiumViewerInstance
-  Cartesian3: new (x: number, y: number, z: number) => unknown
+  Cartesian3: {
+    new (x: number, y: number, z: number): unknown
+    fromDegrees: (longitude: number, latitude: number, height: number) => unknown
+  }
   ConstantPositionProperty: new (value: unknown) => unknown
   Color: { CYAN: unknown; WHITE: unknown }
+  Math: { toRadians: (degrees: number) => number }
   PointPrimitiveCollection: new () => CesiumPointPrimitiveCollection
   ScreenSpaceEventType: { LEFT_CLICK: unknown }
   defined: (value: unknown) => boolean
@@ -83,6 +93,37 @@ interface CesiumViewerProps {
   selectedEntityId?: string | null
   onSelectedEntityIdChange?: (entityId: string | null) => void
   className?: string
+}
+
+interface StoredHomeView {
+  destination: unknown
+  orientation: {
+    heading: number
+    pitch: number
+    roll: number
+  }
+}
+
+function buildStartViewOptions(Cesium: CesiumNamespace): StoredHomeView {
+  const { destination, orientation } = GLOBE_START_VIEW
+
+  return {
+    destination: Cesium.Cartesian3.fromDegrees(
+      destination.lon,
+      destination.lat,
+      destination.heightM,
+    ),
+    orientation: {
+      heading: Cesium.Math.toRadians(orientation.heading),
+      pitch: Cesium.Math.toRadians(orientation.pitch),
+      roll: Cesium.Math.toRadians(orientation.roll),
+    },
+  }
+}
+
+function applyStartView(viewer: CesiumViewerInstance, homeView: StoredHomeView) {
+  viewer.camera.setView(homeView as unknown as Record<string, unknown>)
+  viewer.scene.requestRender()
 }
 
 const CESIUM_SCRIPT_ID = 'cesium-script'
@@ -153,6 +194,7 @@ export default function CesiumViewer({
 }: CesiumViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewerRef = useRef<CesiumViewerInstance | null>(null)
+  const cesiumApiRef = useRef<CesiumNamespace | null>(null)
   const pointsRef = useRef<Map<string, CesiumPointPrimitive>>(new Map())
   const selectionEntitiesRef = useRef<Map<string, CesiumSelectionEntity>>(
     new Map(),
@@ -185,16 +227,20 @@ export default function CesiumViewer({
         timeline: false,
         baseLayerPicker: false,
         geocoder: false,
-        homeButton: true,
+        homeButton: false,
         sceneModePicker: true,
         navigationHelpButton: false,
         fullscreenButton: true,
+        infoBox: false,
         requestRenderMode: true,
         maximumRenderTimeChange: Infinity,
         scene3DOnly: true,
         msaaSamples: 1,
       })
       viewerRef.current = viewer
+      cesiumApiRef.current = Cesium
+
+      applyStartView(viewer, buildStartViewOptions(Cesium))
 
       if (viewer.scene.skyAtmosphere) {
         viewer.scene.skyAtmosphere.show = false
@@ -249,6 +295,7 @@ export default function CesiumViewer({
       }
       viewerRef.current?.destroy()
       viewerRef.current = null
+      cesiumApiRef.current = null
       pointCollectionRef.current = null
       pointsRef.current.clear()
       selectionEntitiesRef.current.clear()

@@ -1,9 +1,6 @@
 import { X } from 'lucide-react'
-import type {
-  SatelliteMetadata,
-  SatellitePositionOk,
-} from '../../lib/satelliteApi'
-import { ORBIT_CLASS_LABELS } from '../../lib/globeFilters'
+import type { SatelliteMetadata, SatellitePositionOk } from '../../lib/satelliteApi'
+import { ORBIT_CLASS_LABELS } from '../../lib/satelliteApi'
 import { Card, CardBody, CardHeader } from '../ui/Card'
 
 interface SatelliteDetailPanelProps {

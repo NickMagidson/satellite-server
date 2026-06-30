@@ -1,6 +1,6 @@
 # Satellite Server Frontend
 
-TanStack Start + React app for satellite position tables and the Cesium globe.
+TanStack Start + React app with a full-screen Cesium globe for live satellite positions.
 
 ## Quick start
 
@@ -33,10 +33,10 @@ Run from repo root with `--workspace apps/frontend`:
 ## Key paths
 
 ```txt
-src/routes/       File-based TanStack Router (/, /about, /globe)
-src/components/   Header, CesiumViewer, ...
-src/hooks/        useSatellitePositions (TanStack Query)
-src/lib/          satelliteApi.ts - fetch + types
+src/routes/       File-based TanStack Router (/)
+src/components/   CesiumViewer, SearchInput, SatelliteDetailPanel, …
+src/hooks/        useSatellitePositions, useSatellites, useSatelliteSearch
+src/lib/          satelliteApi.ts, cesiumCamera.ts
 ```
 
 ## Data fetching
