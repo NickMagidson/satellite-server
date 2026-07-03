@@ -1,0 +1,231 @@
+import { useQuery } from '@tanstack/react-query'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  allocateCorrectionTimeBuffer,
+  allocateMotionBuffer,
+} from '../lib/satelliteMotion/bufferLayout'
+import type {
+  CameraState,
+  MainToWorkerMessage,
+  SatelliteElement,
+  SelectedPositionDetail,
+  WorkerToMainMessage,
+} from '../lib/satelliteMotion/types'
+import { fetchSatelliteElements } from '../lib/satelliteApi'
+import { useSatellites } from './useSatellites'
+
+export interface SatelliteMotionHandle {
+  bufferRef: React.RefObject<Float32Array | null>
+  correctionTimeMsRef: React.RefObject<number>
+  count: number
+  idByIndex: string[]
+  nameByIndex: string[]
+  indexById: Map<string, number>
+  setCameraState: (camera: CameraState) => void
+  setSelectedIndex: (index: number | null) => void
+  selectedDetail: SelectedPositionDetail | null
+  isReady: boolean
+  isPending: boolean
+  isError: boolean
+  error: Error | null
+}
+
+function postToWorker(
+  worker: Worker,
+  message: MainToWorkerMessage,
+  transfer?: Transferable[],
+): void {
+  if (transfer) {
+    worker.postMessage(message, transfer)
+    return
+  }
+  worker.postMessage(message)
+}
+
+function catalogIdentity(elements: SatelliteElement[]): string {
+  return elements.map((element) => element.id).join(',')
+}
+
+export function useSatelliteMotionWorker(): SatelliteMotionHandle {
+  const elementsQuery = useQuery({
+    queryKey: ['satellite-elements'],
+    queryFn: fetchSatelliteElements,
+    staleTime: 60_000,
+  })
+  const satellitesQuery = useSatellites()
+
+  const workerRef = useRef<Worker | null>(null)
+  const bufferRef = useRef<Float32Array | null>(null)
+  const correctionTimeMsRef = useRef(0)
+  const idleBufferRef = useRef<Float32Array | null>(null)
+  const idleCorrectionTimeRef = useRef<Float64Array | null>(null)
+
+  const [selectedDetail, setSelectedDetail] =
+    useState<SelectedPositionDetail | null>(null)
+  const [isReady, setIsReady] = useState(false)
+  const [workerError, setWorkerError] = useState<Error | null>(null)
+
+  const elements = elementsQuery.data?.elements ?? []
+  const count = elements.length
+
+  const idByIndex = useMemo(() => elements.map((element) => element.id), [elements])
+  const nameByIndex = useMemo(
+    () => elements.map((element) => element.name),
+    [elements],
+  )
+  const indexById = useMemo(() => {
+    const map = new Map<string, number>()
+    elements.forEach((element, index) => {
+      map.set(element.id, index)
+    })
+    return map
+  }, [elements])
+
+  const catalogKey = useMemo(() => {
+    const catalogCount = satellitesQuery.data?.count ?? count
+    return `${catalogCount}:${catalogIdentity(elements)}`
+  }, [count, elements, satellitesQuery.data?.count])
+
+  const setCameraState = useCallback((camera: CameraState) => {
+    const worker = workerRef.current
+    if (!worker) {
+      return
+    }
+    postToWorker(worker, { type: 'CAMERA', camera })
+  }, [])
+
+  const setSelectedIndex = useCallback((index: number | null) => {
+    const worker = workerRef.current
+    if (!worker) {
+      return
+    }
+    postToWorker(worker, { type: 'SET_SELECTED', selectedIndex: index })
+    if (index === null) {
+      setSelectedDetail(null)
+    }
+  }, [])
+
+  const refetchElements = elementsQuery.refetch
+
+  useEffect(() => {
+    if (satellitesQuery.dataUpdatedAt === 0) {
+      return
+    }
+    void refetchElements()
+  }, [satellitesQuery.dataUpdatedAt, refetchElements])
+
+  useEffect(() => {
+    const catalogElements = elementsQuery.data?.elements
+
+    if (!elementsQuery.isSuccess || !catalogElements) {
+      bufferRef.current = null
+      correctionTimeMsRef.current = 0
+      setIsReady(false)
+      return
+    }
+
+    if (catalogElements.length === 0) {
+      bufferRef.current = null
+      correctionTimeMsRef.current = 0
+      setIsReady(true)
+      setWorkerError(null)
+      return
+    }
+
+    const worker = new Worker(
+      new URL('../workers/satelliteMotion.worker.ts', import.meta.url),
+      { type: 'module' },
+    )
+    workerRef.current = worker
+
+    const bufferA = allocateMotionBuffer(catalogElements.length)
+    const bufferB = allocateMotionBuffer(catalogElements.length)
+    const timeA = allocateCorrectionTimeBuffer()
+    const timeB = allocateCorrectionTimeBuffer()
+
+    idleBufferRef.current = bufferB
+    idleCorrectionTimeRef.current = timeB
+    setIsReady(false)
+    setWorkerError(null)
+    setSelectedDetail(null)
+
+    worker.onmessage = (event: MessageEvent<WorkerToMainMessage>) => {
+      const message = event.data
+
+      switch (message.type) {
+        case 'BUFFER': {
+          bufferRef.current = message.buffer
+          correctionTimeMsRef.current = message.correctionTime[0]
+          setIsReady(true)
+
+          const idleBuffer = idleBufferRef.current
+          const idleCorrectionTime = idleCorrectionTimeRef.current
+          if (idleBuffer && idleCorrectionTime) {
+            idleBufferRef.current = message.buffer
+            idleCorrectionTimeRef.current = message.correctionTime
+            postToWorker(
+              worker,
+              {
+                type: 'RETURN_BUFFER',
+                buffer: idleBuffer,
+                correctionTime: idleCorrectionTime,
+              },
+              [idleBuffer.buffer, idleCorrectionTime.buffer],
+            )
+          }
+          break
+        }
+        case 'SELECTED_DETAIL':
+          setSelectedDetail(message.detail)
+          break
+        case 'ERROR':
+          setWorkerError(new Error(message.message))
+          break
+      }
+    }
+
+    worker.onerror = (event) => {
+      setWorkerError(new Error(event.message || 'Satellite motion worker failed.'))
+    }
+
+    postToWorker(
+      worker,
+      {
+        type: 'INIT',
+        elements: catalogElements,
+        buffer: bufferA,
+        correctionTime: timeA,
+      },
+      [bufferA.buffer, timeA.buffer],
+    )
+
+    return () => {
+      worker.terminate()
+      workerRef.current = null
+      bufferRef.current = null
+      idleBufferRef.current = null
+      idleCorrectionTimeRef.current = null
+      setIsReady(false)
+    }
+  }, [catalogKey, elementsQuery.data, elementsQuery.isSuccess])
+
+  const error =
+    workerError ??
+    (elementsQuery.error instanceof Error ? elementsQuery.error : null)
+
+  return {
+    bufferRef,
+    correctionTimeMsRef,
+    count,
+    idByIndex,
+    nameByIndex,
+    indexById,
+    setCameraState,
+    setSelectedIndex,
+    selectedDetail,
+    isReady,
+    isPending: elementsQuery.isPending || (count > 0 && !isReady && !error),
+    isError: Boolean(error) || elementsQuery.isError,
+    error,
+  }
+}

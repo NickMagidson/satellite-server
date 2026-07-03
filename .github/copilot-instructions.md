@@ -32,7 +32,7 @@ Load [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md), [`docs/DECISIONS.md`](..
 
 - **Smallest safe change** — no drive-by refactors ([`docs/skills/SKILL-SMALLEST-SAFE-CHANGE.md`](../docs/skills/SKILL-SMALLEST-SAFE-CHANGE.md)).
 - **Pattern first** — match existing code before adding new abstractions ([`docs/skills/SKILL-PATTERN-LOOKUP.md`](../docs/skills/SKILL-PATTERN-LOOKUP.md)).
-- **Server propagates, client displays** — SGP4 and OMM validation stay in `apps/api`; frontend consumes REST positions.
+- **API validates OMM; globe may propagate** — OMM validation stays in `apps/api`; the Cesium globe runs SGP4 in a web worker from `GET /api/satellites/elements`.
 - **Validate before done** — run applicable checks ([`docs/skills/SKILL-REPOSITORY-VALIDATION.md`](../docs/skills/SKILL-REPOSITORY-VALIDATION.md)).
 - **No git actions unless asked** — do not commit, push, or open PRs without explicit user request.
 

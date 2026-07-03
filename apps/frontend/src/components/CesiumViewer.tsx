@@ -1,6 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { SatelliteMotionHandle } from '../hooks/useSatelliteMotionWorker'
 import { GLOBE_START_VIEW } from '../lib/cesiumCamera'
-import type { SatellitePositionOk } from '../lib/satelliteApi'
+import type { CameraState } from '../lib/satelliteMotion/types'
+import {
+  correctionDtSeconds,
+  positionFromMotionBuffer,
+} from '../lib/satelliteMotion/extrapolate'
 
 interface CesiumEntity {
   id?: string
@@ -14,12 +19,23 @@ interface CesiumSelectionEntity extends CesiumEntity {
   }
 }
 
+interface CesiumEvent {
+  addEventListener: (listener: (...args: never[]) => void) => () => void
+}
+
+interface CesiumCartesian3 {
+  x: number
+  y: number
+  z: number
+}
+
 interface CesiumScene {
   pick: (windowPosition: unknown) => { id?: CesiumPickId } | undefined
   primitives: {
     add: (primitive: unknown) => unknown
     remove: (primitive: unknown) => boolean
   }
+  preRender: CesiumEvent
   requestRender: () => void
   skyAtmosphere?: { show: boolean }
   fog?: { enabled: boolean }
@@ -46,6 +62,10 @@ interface CesiumPointPrimitiveCollection {
 
 interface CesiumCamera {
   setView: (options: Record<string, unknown>) => void
+  positionWC: CesiumCartesian3
+  directionWC: CesiumCartesian3
+  changed: CesiumEvent
+  percentageChanged: number
 }
 
 interface CesiumViewerInstance {
@@ -89,7 +109,7 @@ declare global {
 }
 
 interface CesiumViewerProps {
-  positions: SatellitePositionOk[]
+  motion: SatelliteMotionHandle
   selectedEntityId?: string | null
   onSelectedEntityIdChange?: (entityId: string | null) => void
   className?: string
@@ -126,11 +146,20 @@ function applyStartView(viewer: CesiumViewerInstance, homeView: StoredHomeView) 
   viewer.scene.requestRender()
 }
 
+function cameraStateFromViewer(viewer: CesiumViewerInstance): CameraState {
+  const { positionWC, directionWC } = viewer.camera
+  return {
+    positionEcfKm: [positionWC.x / 1000, positionWC.y / 1000, positionWC.z / 1000],
+    directionEcf: [directionWC.x, directionWC.y, directionWC.z],
+  }
+}
+
 const CESIUM_SCRIPT_ID = 'cesium-script'
 const CESIUM_STYLE_ID = 'cesium-style'
 const CESIUM_SCRIPT_SRC = '/cesium/Cesium.js'
 const CESIUM_STYLE_HREF = '/cesium/Widgets/widgets.css'
 const SATELLITE_POINT_SIZE = 6
+const CAMERA_THROTTLE_MS = 100
 
 function ensureCesiumStylesheet(): void {
   if (document.getElementById(CESIUM_STYLE_ID)) {
@@ -187,7 +216,7 @@ function loadCesium(): Promise<CesiumNamespace> {
 }
 
 export default function CesiumViewer({
-  positions,
+  motion,
   selectedEntityId = null,
   onSelectedEntityIdChange,
   className,
@@ -201,14 +230,27 @@ export default function CesiumViewer({
   )
   const pointCollectionRef = useRef<CesiumPointPrimitiveCollection | null>(null)
   const onSelectedEntityIdChangeRef = useRef(onSelectedEntityIdChange)
+  const motionRef = useRef(motion)
+  const selectedEntityIdRef = useRef(selectedEntityId)
+  const [viewerReady, setViewerReady] = useState(false)
 
   useEffect(() => {
     onSelectedEntityIdChangeRef.current = onSelectedEntityIdChange
   }, [onSelectedEntityIdChange])
 
   useEffect(() => {
+    motionRef.current = motion
+  }, [motion])
+
+  useEffect(() => {
+    selectedEntityIdRef.current = selectedEntityId
+  }, [selectedEntityId])
+
+  useEffect(() => {
     let cancelled = false
     let CesiumApi: CesiumNamespace | null = null
+    let removePreRender: (() => void) | null = null
+    let removeCameraChanged: (() => void) | null = null
 
     async function init() {
       ensureCesiumStylesheet()
@@ -263,6 +305,7 @@ export default function CesiumViewer({
       const pointCollection = new Cesium.PointPrimitiveCollection()
       viewer.scene.primitives.add(pointCollection)
       pointCollectionRef.current = pointCollection
+      setViewerReady(true)
 
       viewer.screenSpaceEventHandler.setInputAction((click) => {
         const picked = viewer.scene.pick(click.position)
@@ -278,12 +321,71 @@ export default function CesiumViewer({
         onSelectedEntityIdChangeRef.current?.(entityId)
         viewer.scene.requestRender()
       }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
+
+      let lastCameraPostMs = 0
+      const onCameraChanged = () => {
+        const now = performance.now()
+        if (now - lastCameraPostMs < CAMERA_THROTTLE_MS) {
+          return
+        }
+        lastCameraPostMs = now
+        motionRef.current.setCameraState(cameraStateFromViewer(viewer))
+      }
+      viewer.camera.percentageChanged = 0.01
+      removeCameraChanged = viewer.camera.changed.addEventListener(onCameraChanged)
+      motionRef.current.setCameraState(cameraStateFromViewer(viewer))
+
+      const onPreRender = () => {
+        const currentMotion = motionRef.current
+        const buffer = currentMotion.bufferRef.current
+        const pointCollectionCurrent = pointCollectionRef.current
+        if (!buffer || !pointCollectionCurrent || currentMotion.count === 0) {
+          viewer.scene.requestRender()
+          return
+        }
+
+        const dtSeconds = correctionDtSeconds(
+          currentMotion.correctionTimeMsRef.current,
+        )
+        const date = new Date()
+        const points = pointsRef.current
+        const selectionEntities = selectionEntitiesRef.current
+
+        for (let index = 0; index < currentMotion.count; index += 1) {
+          const id = currentMotion.idByIndex[index]
+          if (!id) {
+            continue
+          }
+
+          const ecfMeters = positionFromMotionBuffer(buffer, index, dtSeconds, date)
+          const point = points.get(id)
+          if (!ecfMeters || !point) {
+            continue
+          }
+
+          const cartesian = new Cesium.Cartesian3(
+            ecfMeters.x,
+            ecfMeters.y,
+            ecfMeters.z,
+          )
+          point.position = cartesian
+          selectionEntities.get(id)?.position.setValue(cartesian)
+        }
+
+        viewer.scene.requestRender()
+      }
+
+      removePreRender = viewer.scene.preRender.addEventListener(onPreRender)
+      viewer.scene.requestRender()
     }
 
     void init()
 
     return () => {
       cancelled = true
+      setViewerReady(false)
+      removePreRender?.()
+      removeCameraChanged?.()
       const viewer = viewerRef.current
       if (viewer && CesiumApi) {
         viewer.screenSpaceEventHandler.removeInputAction(
@@ -303,17 +405,21 @@ export default function CesiumViewer({
   }, [])
 
   useEffect(() => {
-    async function updatePoints() {
+    if (!viewerReady) {
+      return
+    }
+
+    async function syncCatalog() {
       const viewer = viewerRef.current
       const pointCollection = pointCollectionRef.current
-      if (!viewer || !pointCollection) {
+      const Cesium = cesiumApiRef.current
+      if (!viewer || !pointCollection || !Cesium) {
         return
       }
 
-      const Cesium = await loadCesium()
       const points = pointsRef.current
       const selectionEntities = selectionEntitiesRef.current
-      const visibleIds = new Set(positions.map((position) => position.id))
+      const visibleIds = new Set(motion.idByIndex)
 
       for (const [id, point] of points) {
         if (!visibleIds.has(id)) {
@@ -323,56 +429,59 @@ export default function CesiumViewer({
         }
       }
 
-      for (const position of positions) {
-        const { xKm, yKm, zKm } = position.ecf
-        const cartesian = new Cesium.Cartesian3(
-          xKm * 1000,
-          yKm * 1000,
-          zKm * 1000,
-        )
-
-        const existing = points.get(position.id)
-        if (!existing) {
-          const selectionEntity = new Cesium.Entity({
-            id: position.id,
-            name: position.name,
-            position: new Cesium.ConstantPositionProperty(cartesian),
-          })
-          const point = pointCollection.add({
-            id: selectionEntity,
-            position: cartesian,
-            pixelSize: SATELLITE_POINT_SIZE,
-            color: Cesium.Color.CYAN,
-            outlineColor: Cesium.Color.WHITE,
-            outlineWidth: 1,
-          })
-          points.set(position.id, point)
-          selectionEntities.set(position.id, selectionEntity)
+      for (let index = 0; index < motion.count; index += 1) {
+        const id = motion.idByIndex[index]
+        const name = motion.nameByIndex[index] ?? id
+        if (!id || points.has(id)) {
           continue
         }
 
-        existing.position = cartesian
-        selectionEntities.get(position.id)?.position.setValue(cartesian)
+        const cartesian = new Cesium.Cartesian3(0, 0, 0)
+        const selectionEntity = new Cesium.Entity({
+          id,
+          name,
+          position: new Cesium.ConstantPositionProperty(cartesian),
+        })
+        const point = pointCollection.add({
+          id: selectionEntity,
+          position: cartesian,
+          pixelSize: SATELLITE_POINT_SIZE,
+          color: Cesium.Color.CYAN,
+          outlineColor: Cesium.Color.WHITE,
+          outlineWidth: 1,
+        })
+        points.set(id, point)
+        selectionEntities.set(id, selectionEntity)
       }
 
       viewer.scene.requestRender()
     }
 
-    void updatePoints()
-  }, [positions, selectedEntityId])
+    void syncCatalog()
+  }, [viewerReady, motion.count, motion.idByIndex, motion.nameByIndex])
 
   useEffect(() => {
+    if (!viewerReady) {
+      return
+    }
+
     const viewer = viewerRef.current
     if (!viewer) {
       return
     }
+
+    const selectedIndex =
+      selectedEntityId === null
+        ? null
+        : (motion.indexById.get(selectedEntityId) ?? null)
+    motion.setSelectedIndex(selectedIndex)
 
     viewer.trackedEntity = undefined
     viewer.selectedEntity = selectedEntityId
       ? selectionEntitiesRef.current.get(selectedEntityId)
       : undefined
     viewer.scene.requestRender()
-  }, [positions, selectedEntityId])
+  }, [viewerReady, motion.indexById, motion.setSelectedIndex, selectedEntityId])
 
   return <div ref={containerRef} className={className} />
 }

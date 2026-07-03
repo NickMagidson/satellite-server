@@ -152,6 +152,14 @@ export class SatelliteCatalog {
     return this.entries.map(toMetadata);
   }
 
+  getElements(): { id: string; name: string; omm: NormalizedOmmRecord }[] {
+    return this.entries.map((entry) => ({
+      id: entry.id,
+      name: entry.name,
+      omm: entry.omm,
+    }));
+  }
+
   getCurrentSnapshot(): SatelliteSnapshot {
     return {
       updatedAt: this.updatedAt,

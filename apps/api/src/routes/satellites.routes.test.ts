@@ -1,5 +1,7 @@
 import request from 'supertest';
 import { afterEach, describe, expect, it } from 'vitest';
+import { createApp } from '../app.js';
+import { SatelliteCatalog } from '../services/satelliteCatalog.js';
 import { validOmm } from '../test/fixtures.js';
 import { createTestApp } from '../test/createTestApp.js';
 
@@ -66,6 +68,43 @@ describe('satellite routes', () => {
         }),
       ],
     });
+  });
+
+  it('returns orbital elements for client-side propagation', async () => {
+    const { app } = createTrackedTestApp();
+
+    const response = await request(app).get('/api/satellites/elements').expect(200);
+
+    expect(response.body).toMatchObject({
+      count: 1,
+      elements: [
+        expect.objectContaining({
+          id: '25544',
+          name: 'ISS SAMPLE',
+          omm: expect.objectContaining({
+            NORAD_CAT_ID: 25544,
+            EPOCH: '2025-03-26T06:00:00.000000',
+            MEAN_MOTION: 15.50015342,
+          }),
+        }),
+      ],
+    });
+  });
+
+  it('returns an empty elements list when the catalog is empty', async () => {
+    const catalog = new SatelliteCatalog();
+    const app = createApp({ catalog, databaseUrl: null });
+
+    try {
+      const response = await request(app).get('/api/satellites/elements').expect(200);
+
+      expect(response.body).toEqual({
+        count: 0,
+        elements: [],
+      });
+    } finally {
+      catalog.stop();
+    }
   });
 
   it('returns positions for a requested timestamp', async () => {

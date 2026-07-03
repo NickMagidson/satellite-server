@@ -15,14 +15,16 @@ Hard safety rules for AI-assisted changes in Satellite Server. These override co
 
 | Workspace | Owns | Must not contain |
 |-----------|------|------------------|
-| `apps/api` | HTTP routes, OMM validation, SGP4 propagation, position cache, Prisma access | React/UI code, client-side orbit math |
-| `apps/frontend` | Routes, components, hooks, API client, Cesium viewer | SGP4 propagation, OMM validation, direct DB access |
+| `apps/api` | HTTP routes, OMM validation, SGP4 for REST positions, position cache, Prisma access | React/UI code |
+| `apps/frontend` | Routes, components, hooks, API client, Cesium viewer, worker SGP4 for globe rendering | OMM validation, direct DB access |
 | `packages/db` | Prisma schema, migrations, generate scripts | HTTP handlers, business logic, UI |
 
 **Cross-boundary rules:**
 
-- Propagation runs on the API via `satellite.js`; the frontend consumes REST positions only.
-- OMM validation lives in `apps/api/src/validation/` — do not duplicate in the frontend.
+- OMM validation and ingest stay on the API (`apps/api/src/validation/`). Do not re-validate OMM on the frontend.
+- The globe may run SGP4 in a **web worker** (`satelliteMotion.worker.ts`) for frame-driven rendering, using validated elements from `GET /api/satellites/elements`.
+- REST position endpoints (`/positions`, `/:id/position`) remain available for non-globe consumers; the globe does not poll them.
+- Do not add a shared workspace package for orbital types — keep frontend element types local.
 - Database writes for OMM records go through `ommRecordStore.ts`, not ad hoc SQL.
 - Do not add TanStack Start server API routes for satellite data — HTTP API stays in `apps/api`.
 

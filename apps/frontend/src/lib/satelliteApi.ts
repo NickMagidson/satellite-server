@@ -1,3 +1,5 @@
+import type { SatelliteElementsResponse } from './satelliteMotion/types'
+
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
 export interface GeodeticPosition {
@@ -93,6 +95,16 @@ export async function fetchSatellitePositions(): Promise<SatelliteSnapshot> {
   }
 
   return response.json() as Promise<SatelliteSnapshot>
+}
+
+export async function fetchSatelliteElements(): Promise<SatelliteElementsResponse> {
+  const response = await fetch(`${API_BASE}/api/satellites/elements`)
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch satellite elements (${response.status})`)
+  }
+
+  return response.json() as Promise<SatelliteElementsResponse>
 }
 
 export function isSatellitePositionOk(

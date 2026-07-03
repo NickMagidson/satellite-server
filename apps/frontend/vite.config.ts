@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import type { Plugin } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
@@ -71,6 +72,9 @@ function cesiumAssetsPlugin(): Plugin {
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
+  worker: {
+    format: 'es',
+  },
   plugins: [
     devtools(),
     tailwindcss(),
@@ -78,6 +82,9 @@ const config = defineConfig({
     viteReact(),
     cesiumAssetsPlugin(),
   ],
+  test: {
+    environment: 'node',
+  },
 })
 
 export default config

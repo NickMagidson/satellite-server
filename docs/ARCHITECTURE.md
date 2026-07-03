@@ -53,11 +53,12 @@ TanStack Start + React 19 + Vite + Tailwind 4 + Cesium.
 |-----------|----------------|
 | `src/routes/` | File-based TanStack Router (`/` — globe page) |
 | `src/components/` | CesiumViewer, SearchInput, SatelliteDetailPanel |
-| `src/hooks/` | `useSatellitePositions`, `useSatellites`, `useSatelliteSearch` |
-| `src/lib/` | `satelliteApi.ts` — fetch wrapper + types |
-| `vite.config.ts` | TanStack Start, Tailwind, Cesium asset plugin |
+| `src/hooks/` | `useSatelliteMotionWorker`, `useSatellites`, `useSatelliteSearch` (`useSatellitePositions` for REST consumers) |
+| `src/lib/` | `satelliteApi.ts`, `satelliteMotion/` buffer layout + extrapolation |
+| `src/workers/` | `satelliteMotion.worker.ts` — tiered SGP4 into transferable buffers |
+| `vite.config.ts` | TanStack Start, Tailwind, Cesium asset plugin, `worker.format: 'es'` |
 
-**Data fetching:** TanStack Query in hooks; `refetchInterval` follows API `updateIntervalMs`.
+**Data fetching:** TanStack Query loads catalog metadata and orbital elements once; the globe worker owns live motion.
 
 **API base URL:** `import.meta.env.VITE_API_URL` (default `http://localhost:3000`).
 
@@ -87,18 +88,20 @@ Consumed by the API through `@prisma/client` in `ommRecordStore.ts`. No build st
                     │ SatelliteCatalog │◄── POST /api/satellites/omms
                     │  (satellite.js)  │
                     └────────┬────────┘
-                             │ propagate each tick (UPDATE_INTERVAL_MS)
-                             ▼
-                    ┌─────────────────┐
-                    │  REST positions  │
-                    │  /api/satellites │
-                    └────────┬────────┘
-                             │ fetch (TanStack Query)
-                             ▼
-                    ┌─────────────────┐
-                    │    frontend      │
-                    │  table / Cesium  │
-                    └─────────────────┘
+                             │
+              ┌──────────────┼──────────────────┐
+              ▼              ▼                  ▼
+     GET /elements    REST /positions     metadata GET /
+              │         (cache tick)            │
+              ▼                                 ▼
+     useSatelliteMotionWorker            useSatellites
+              │
+              ▼
+     satelliteMotion.worker (SGP4 tiers)
+              │ ping-pong Float32Array
+              ▼
+     CesiumViewer preRender
+       extrapolate ECI → ECF meters
 ```
 
 ## HTTP API
@@ -109,11 +112,12 @@ Consumed by the API through `@prisma/client` in `ommRecordStore.ts`. No build st
 | `GET` | `/api/satellites` | Satellite metadata |
 | `GET` | `/api/satellites/positions` | Cached live positions |
 | `GET` | `/api/satellites/positions?at=<ISO>` | Propagate all at timestamp |
+| `GET` | `/api/satellites/elements` | Validated OMM elements for client-side globe propagation |
 | `GET` | `/api/satellites/:id/position` | Single `SatellitePosition` object (live cache) |
 | `GET` | `/api/satellites/:id/position?at=<ISO>` | Single position propagated at timestamp |
 | `POST` | `/api/satellites/omms` | Replace active OMM set (**202 Accepted** + snapshot) |
 
-**Route ordering:** `/positions` is registered before `/:id/position` so `positions` is not captured as an id.
+**Route ordering:** `/positions` and `/elements` are registered before `/:id/position` so those path segments are not captured as an id.
 
 Errors: `HttpError` / `ValidationError` → JSON `{ error, details? }` with appropriate status (400 validation, 404 not found, 500 default).
 
