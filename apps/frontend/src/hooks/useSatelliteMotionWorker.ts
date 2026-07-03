@@ -16,7 +16,8 @@ import { useSatellites } from './useSatellites'
 
 export interface SatelliteMotionHandle {
   bufferRef: React.RefObject<Float32Array | null>
-  correctionTimeMsRef: React.RefObject<number>
+  /** Per-satellite last-SGP4 epoch (ms), same length as the motion buffer catalog. */
+  correctionTimeRef: React.RefObject<Float64Array | null>
   count: number
   idByIndex: string[]
   nameByIndex: string[]
@@ -56,7 +57,7 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
 
   const workerRef = useRef<Worker | null>(null)
   const bufferRef = useRef<Float32Array | null>(null)
-  const correctionTimeMsRef = useRef(0)
+  const correctionTimeRef = useRef<Float64Array | null>(null)
   const idleBufferRef = useRef<Float32Array | null>(null)
   const idleCorrectionTimeRef = useRef<Float64Array | null>(null)
 
@@ -119,14 +120,14 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
 
     if (!elementsQuery.isSuccess || !catalogElements) {
       bufferRef.current = null
-      correctionTimeMsRef.current = 0
+      correctionTimeRef.current = null
       setIsReady(false)
       return
     }
 
     if (catalogElements.length === 0) {
       bufferRef.current = null
-      correctionTimeMsRef.current = 0
+      correctionTimeRef.current = null
       setIsReady(true)
       setWorkerError(null)
       return
@@ -138,10 +139,11 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
     )
     workerRef.current = worker
 
-    const bufferA = allocateMotionBuffer(catalogElements.length)
-    const bufferB = allocateMotionBuffer(catalogElements.length)
-    const timeA = allocateCorrectionTimeBuffer()
-    const timeB = allocateCorrectionTimeBuffer()
+    const catalogCount = catalogElements.length
+    const bufferA = allocateMotionBuffer(catalogCount)
+    const bufferB = allocateMotionBuffer(catalogCount)
+    const timeA = allocateCorrectionTimeBuffer(catalogCount)
+    const timeB = allocateCorrectionTimeBuffer(catalogCount)
 
     idleBufferRef.current = bufferB
     idleCorrectionTimeRef.current = timeB
@@ -155,7 +157,7 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
       switch (message.type) {
         case 'BUFFER': {
           bufferRef.current = message.buffer
-          correctionTimeMsRef.current = message.correctionTime[0]
+          correctionTimeRef.current = message.correctionTime
           setIsReady(true)
 
           const idleBuffer = idleBufferRef.current
@@ -203,6 +205,7 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
       worker.terminate()
       workerRef.current = null
       bufferRef.current = null
+      correctionTimeRef.current = null
       idleBufferRef.current = null
       idleCorrectionTimeRef.current = null
       setIsReady(false)
@@ -215,7 +218,7 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
 
   return {
     bufferRef,
-    correctionTimeMsRef,
+    correctionTimeRef,
     count,
     idByIndex,
     nameByIndex,

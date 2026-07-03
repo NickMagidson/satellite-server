@@ -121,9 +121,7 @@ function writeEntry(
 function publishBuffer(
   buffer: Float32Array,
   correctionTime: Float64Array,
-  atMs: number,
 ): void {
-  correctionTime[0] = atMs
   writeBuffer = null
   writeCorrectionTime = null
   waitingForBuffer = true
@@ -200,9 +198,11 @@ function tick(): void {
       runSgp4(entry, date, atMs)
     }
     writeEntry(buffer, index, entry)
+    // Per-satellite epoch so main-thread extrapolation uses time since this sat's SGP4.
+    correctionTime[index] = entry.lastSgp4Ms
   })
 
-  publishBuffer(buffer, correctionTime, atMs)
+  publishBuffer(buffer, correctionTime)
   maybePostSelectedDetail(date, atMs)
 }
 
@@ -227,9 +227,10 @@ function loadCatalog(
   entries.forEach((entry, index) => {
     runSgp4(entry, date, atMs)
     writeEntry(buffer, index, entry)
+    correctionTime[index] = entry.lastSgp4Ms
   })
 
-  publishBuffer(buffer, correctionTime, atMs)
+  publishBuffer(buffer, correctionTime)
   ensureLoop()
 }
 

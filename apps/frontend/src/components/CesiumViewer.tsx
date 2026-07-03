@@ -338,15 +338,18 @@ export default function CesiumViewer({
       const onPreRender = () => {
         const currentMotion = motionRef.current
         const buffer = currentMotion.bufferRef.current
+        const correctionTimes = currentMotion.correctionTimeRef.current
         const pointCollectionCurrent = pointCollectionRef.current
-        if (!buffer || !pointCollectionCurrent || currentMotion.count === 0) {
+        if (
+          !buffer ||
+          !correctionTimes ||
+          !pointCollectionCurrent ||
+          currentMotion.count === 0
+        ) {
           viewer.scene.requestRender()
           return
         }
 
-        const dtSeconds = correctionDtSeconds(
-          currentMotion.correctionTimeMsRef.current,
-        )
         const date = new Date()
         const points = pointsRef.current
         const selectionEntities = selectionEntitiesRef.current
@@ -357,7 +360,13 @@ export default function CesiumViewer({
             continue
           }
 
-          const ecfMeters = positionFromMotionBuffer(buffer, index, dtSeconds, date)
+          const dtSeconds = correctionDtSeconds(correctionTimes[index])
+          const ecfMeters = positionFromMotionBuffer(
+            buffer,
+            index,
+            dtSeconds,
+            date,
+          )
           const point = points.get(id)
           if (!ecfMeters || !point) {
             continue

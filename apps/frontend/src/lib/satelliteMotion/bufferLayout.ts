@@ -22,8 +22,9 @@ export function allocateMotionBuffer(count: number): Float32Array {
   return new Float32Array(count * SATELLITE_STRIDE)
 }
 
-export function allocateCorrectionTimeBuffer(): Float64Array {
-  return new Float64Array(1)
+/** One last-SGP4 epoch (ms) per satellite, aligned with motion buffer indices. */
+export function allocateCorrectionTimeBuffer(count: number): Float64Array {
+  return new Float64Array(count)
 }
 
 export function getFlags(buffer: Float32Array, satelliteIndex: number): number {

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   FLAG_IN_FOV,
   FLAG_VALID,
+  allocateCorrectionTimeBuffer,
   allocateMotionBuffer,
   getFlags,
   hasFlag,
@@ -91,5 +92,37 @@ describe('correctionDtSeconds', () => {
   it('computes non-negative seconds between correction and now', () => {
     expect(correctionDtSeconds(1000, 2500)).toBe(1.5)
     expect(correctionDtSeconds(3000, 2500)).toBe(0)
+  })
+
+  it('supports per-satellite correction epochs', () => {
+    const correctionTimes = allocateCorrectionTimeBuffer(3)
+    correctionTimes[0] = 1000
+    correctionTimes[1] = 2000
+    correctionTimes[2] = 500
+
+    expect(correctionDtSeconds(correctionTimes[0], 2500)).toBe(1.5)
+    expect(correctionDtSeconds(correctionTimes[1], 2500)).toBe(0.5)
+    expect(correctionDtSeconds(correctionTimes[2], 2500)).toBe(2)
+  })
+})
+
+describe('positionFromMotionBuffer with extrapolation', () => {
+  it('advances ECF when dt is non-zero', () => {
+    const buffer = allocateMotionBuffer(1)
+    writeEciState(
+      buffer,
+      0,
+      { x: 5000, y: 0, z: 0 },
+      { x: 7.5, y: 0, z: 0 },
+      FLAG_VALID,
+    )
+    const date = new Date('2025-03-26T06:00:00Z')
+
+    const atCorrection = positionFromMotionBuffer(buffer, 0, 0, date)
+    const afterOneSecond = positionFromMotionBuffer(buffer, 0, 1, date)
+
+    expect(atCorrection).not.toBeNull()
+    expect(afterOneSecond).not.toBeNull()
+    expect(afterOneSecond!.x).not.toBe(atCorrection!.x)
   })
 })
