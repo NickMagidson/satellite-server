@@ -85,6 +85,7 @@ After the task, check whether any of these need updates:
 - New endpoint or env var → [`README.md`](../README.md)
 - New pattern or boundary → [`ARCHITECTURE.md`](./ARCHITECTURE.md), [`DECISIONS.md`](./DECISIONS.md)
 - New repeatable procedure → new skill under `docs/skills/` + [`SKILLS.md`](./SKILLS.md)
+- CesiumJS API guidance → skills under `docs/skills/CESIUM-SKILLS/` + index in [`SKILLS.md`](./SKILLS.md#cesiumjs-domain-skills)
 - Task category gap → [`TASK-CLASSIFICATION.md`](./TASK-CLASSIFICATION.md)
 
 Skip doc updates for trivial bug fixes that don't change patterns.

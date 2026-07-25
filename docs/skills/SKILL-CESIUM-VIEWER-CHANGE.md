@@ -32,11 +32,14 @@ Safely adjust Cesium viewer behavior, entities, camera, or map-related UI in the
   - controls or overlays tightly coupled to the viewer
   - wiring propagated satellite positions from the API into the globe
 
+Always pair this skill with the CesiumJS domain pack when changing Cesium API usage: start at [`CESIUM-SKILLS/using-cesiumjs-skills/SKILL.md`](./CESIUM-SKILLS/using-cesiumjs-skills/SKILL.md), then load only the matching domain `SKILL.md` (camera, entities, interaction, etc.). See [`docs/SKILLS.md`](../SKILLS.md#cesiumjs-domain-skills).
+
 ### When *not* to use this skill
 
 - For general page layout or non-map UI (search overlay, detail panel) — edit `apps/frontend/src/components/` and `src/routes/index.tsx`.
 - For API propagation logic, OMM validation, or catalog changes — work in `apps/api`.
 - For orbital mechanics concepts (TLE, OMM, SGP4, frames) — see `SKILL-SATELLITE-PROPAGATION-BASICS.md`.
+- For CesiumJS API details alone (without this app's integration) — use the matching skill under `CESIUM-SKILLS/` after the orientation skill.
 
 ---
 
@@ -104,6 +107,8 @@ Safely adjust Cesium viewer behavior, entities, camera, or map-related UI in the
 ### Related skills
 
 - `SKILL-SATELLITE-PROPAGATION-BASICS.md` — TLE/OMM, SGP4, coordinate frames, visualization pipeline
+- [`CESIUM-SKILLS/using-cesiumjs-skills/SKILL.md`](./CESIUM-SKILLS/using-cesiumjs-skills/SKILL.md) — CesiumJS domain skill map (load next for API-level work)
+- Matching skill under [`CESIUM-SKILLS/`](./CESIUM-SKILLS/) — e.g. `cesiumjs-camera`, `cesiumjs-entities`, `cesiumjs-interaction`, `cesiumjs-spatial-math` (see [`docs/SKILLS.md`](../SKILLS.md#cesiumjs-domain-skills))
 
 ### Related documentation
 

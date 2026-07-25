@@ -28,6 +28,8 @@ Task → classify → load skills → guardrails → implement → validate → 
 
 Load [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md), [`docs/DECISIONS.md`](../docs/DECISIONS.md), and [`docs/STYLES.md`](../docs/STYLES.md) only when placement, patterns, or conventions are unclear.
 
+For **Cesium / globe** work: after [`docs/skills/SKILL-CESIUM-VIEWER-CHANGE.md`](../docs/skills/SKILL-CESIUM-VIEWER-CHANGE.md), load [`docs/skills/CESIUM-SKILLS/using-cesiumjs-skills/SKILL.md`](../docs/skills/CESIUM-SKILLS/using-cesiumjs-skills/SKILL.md) and only the matching domain skill(s) from [`docs/SKILLS.md`](../docs/SKILLS.md#cesiumjs-domain-skills).
+
 ## Non-negotiables
 
 - **Smallest safe change** — no drive-by refactors ([`docs/skills/SKILL-SMALLEST-SAFE-CHANGE.md`](../docs/skills/SKILL-SMALLEST-SAFE-CHANGE.md)).

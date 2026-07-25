@@ -17,7 +17,7 @@ Both follow the same documentation workflow ([`WORKFLOW.md`](./WORKFLOW.md)).
 2. [`.github/copilot-instructions.md`](../.github/copilot-instructions.md)
 3. This file
 4. [`TASK-CLASSIFICATION.md`](./TASK-CLASSIFICATION.md)
-5. Required skills from [`SKILLS.md`](./SKILLS.md)
+5. Required skills from [`SKILLS.md`](./SKILLS.md) (including [`CESIUM-SKILLS`](./SKILLS.md#cesiumjs-domain-skills) for globe/Cesium API work)
 6. [`GUARDRAILS.md`](./GUARDRAILS.md)
 
 Load [`ARCHITECTURE.md`](./ARCHITECTURE.md), [`DECISIONS.md`](./DECISIONS.md), and [`STYLES.md`](./STYLES.md) only when needed.
