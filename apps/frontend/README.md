@@ -41,9 +41,14 @@ src/lib/          satelliteApi.ts, cesiumCamera.ts
 
 ## Data fetching
 
-This app uses **TanStack Query hooks** to poll `GET /api/satellites/positions`. It does **not** use TanStack Router loaders or TanStack server API routes for satellite data - the Express API in `apps/api` owns propagation.
+This app uses **TanStack Query hooks** to fetch satellite metadata from
+`GET /api/satellites` and globe propagation elements from
+`GET /api/satellites/elements`. The Cesium globe runs SGP4 in a web worker and
+does not poll `GET /api/satellites/positions` for animation.
 
 Configure the API URL with `VITE_API_URL` (default `http://localhost:3000`).
+Enable browser console profiling for large catalogs with
+`VITE_SATELLITE_PERF_LOGS=true`.
 
 ## Documentation
 

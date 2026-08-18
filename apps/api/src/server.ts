@@ -3,7 +3,10 @@ import { config } from './config.js';
 import { loadInitialOmms } from './services/initialOmmLoader.js';
 import { SatelliteCatalog } from './services/satelliteCatalog.js';
 
-const catalog = new SatelliteCatalog({ updateIntervalMs: config.updateIntervalMs });
+const catalog = new SatelliteCatalog({
+  updateIntervalMs: config.updateIntervalMs,
+  liveRefreshEnabled: config.livePositionRefreshEnabled,
+});
 const app = createApp({ catalog, databaseUrl: config.databaseUrl });
 
 loadInitialOmms({

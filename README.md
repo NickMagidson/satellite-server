@@ -52,6 +52,19 @@ Change the update interval:
 UPDATE_INTERVAL_MS=1000 npm --workspace apps/api start
 ```
 
+For large globe catalogs, disable scheduled server-side live position snapshots
+and let the frontend propagate from `/api/satellites/elements`:
+
+```sh
+LIVE_POSITION_REFRESH_ENABLED=false npm --workspace apps/api start
+```
+
+To profile large frontend catalogs, enable compact browser console timings:
+
+```sh
+VITE_SATELLITE_PERF_LOGS=true npm --workspace apps/frontend run dev
+```
+
 ## Run with Docker Compose
 
 Copy `.env.example` to `.env` if you want to override the defaults, then start the API and Postgres:

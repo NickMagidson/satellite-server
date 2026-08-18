@@ -128,4 +128,24 @@ describe('SatelliteCatalog', () => {
 
     catalog.stop();
   });
+
+  it('can skip scheduled live position refreshes for large globe catalogs', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(validOmm.EPOCH));
+
+    const catalog = new SatelliteCatalog({
+      updateIntervalMs: 1000,
+      liveRefreshEnabled: false,
+    });
+    catalog.loadOmms([validOmm]);
+    catalog.start();
+
+    const firstPropagatedAt = catalog.getCurrentSnapshot().propagatedAt;
+    vi.setSystemTime(new Date('2025-03-26T06:00:01.000Z'));
+    vi.advanceTimersByTime(1000);
+
+    expect(catalog.getCurrentSnapshot().propagatedAt).toBe(firstPropagatedAt);
+
+    catalog.stop();
+  });
 });

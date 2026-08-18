@@ -12,6 +12,7 @@ import type {
   WorkerToMainMessage,
 } from '../lib/satelliteMotion/types'
 import { fetchSatelliteElements } from '../lib/satelliteApi'
+import { logSatellitePerf } from '../lib/perfLogging'
 import { useSatellites } from './useSatellites'
 
 export interface SatelliteMotionHandle {
@@ -50,7 +51,15 @@ function catalogIdentity(elements: SatelliteElement[]): string {
 export function useSatelliteMotionWorker(): SatelliteMotionHandle {
   const elementsQuery = useQuery({
     queryKey: ['satellite-elements'],
-    queryFn: fetchSatelliteElements,
+    queryFn: async () => {
+      const startedAt = performance.now()
+      const response = await fetchSatelliteElements()
+      logSatellitePerf('fetch_elements', {
+        count: response.count,
+        durationMs: Math.round(performance.now() - startedAt),
+      })
+      return response
+    },
     staleTime: 60_000,
   })
   const satellitesQuery = useSatellites()
@@ -138,6 +147,8 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
       { type: 'module' },
     )
     workerRef.current = worker
+    const workerInitStartedAt = performance.now()
+    let loggedFirstBuffer = false
 
     const catalogCount = catalogElements.length
     const bufferA = allocateMotionBuffer(catalogCount)
@@ -159,6 +170,14 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
           bufferRef.current = message.buffer
           correctionTimeRef.current = message.correctionTime
           setIsReady(true)
+
+          if (!loggedFirstBuffer) {
+            loggedFirstBuffer = true
+            logSatellitePerf('worker_ready', {
+              count: catalogCount,
+              durationMs: Math.round(performance.now() - workerInitStartedAt),
+            })
+          }
 
           const idleBuffer = idleBufferRef.current
           const idleCorrectionTime = idleCorrectionTimeRef.current

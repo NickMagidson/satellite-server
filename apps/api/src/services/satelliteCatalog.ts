@@ -15,6 +15,7 @@ const DEFAULT_UPDATE_INTERVAL_MS = 1000;
 
 interface SatelliteCatalogOptions {
   updateIntervalMs?: number;
+  liveRefreshEnabled?: boolean;
 }
 
 function getSatelliteId(omm: NormalizedOmmRecord, index: number): string {
@@ -99,13 +100,18 @@ function toMetadata(entry: SatelliteEntry): SatelliteMetadata {
 
 export class SatelliteCatalog {
   private readonly updateIntervalMs: number;
+  private readonly liveRefreshEnabled: boolean;
   private entries: SatelliteEntry[];
   private currentPositions: SatellitePosition[];
   private updatedAt: string | null;
   private interval: NodeJS.Timeout | null;
 
-  constructor({ updateIntervalMs = DEFAULT_UPDATE_INTERVAL_MS }: SatelliteCatalogOptions = {}) {
+  constructor({
+    updateIntervalMs = DEFAULT_UPDATE_INTERVAL_MS,
+    liveRefreshEnabled = true,
+  }: SatelliteCatalogOptions = {}) {
     this.updateIntervalMs = updateIntervalMs;
+    this.liveRefreshEnabled = liveRefreshEnabled;
     this.entries = [];
     this.currentPositions = [];
     this.updatedAt = null;
@@ -132,6 +138,9 @@ export class SatelliteCatalog {
 
   start(): void {
     this.stop();
+    if (!this.liveRefreshEnabled) {
+      return;
+    }
     this.interval = setInterval(() => this.updateCurrentPositions(), this.updateIntervalMs);
   }
 
