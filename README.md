@@ -118,6 +118,7 @@ GET  /health
 GET  /api/satellites
 GET  /api/satellites/positions
 GET  /api/satellites/positions?at=2026-01-01T00:00:00Z
+GET  /api/satellites/elements
 GET  /api/satellites/:id/position
 GET  /api/satellites/:id/position?at=2026-01-01T00:00:00Z
 POST /api/satellites/omms
@@ -147,6 +148,26 @@ POST /api/satellites/omms
 `GET /api/satellites/positions` returns the latest one-second cached positions.
 
 `GET /api/satellites/positions?at=2026-01-01T00:00:00Z` propagates all satellites at the requested UTC timestamp without changing the live cache.
+
+`GET /api/satellites/elements` returns validated OMM records for client-side globe propagation (web worker). The Cesium globe bootstraps from this endpoint once and does not poll `/positions`.
+
+```json
+{
+  "count": 1,
+  "elements": [
+    {
+      "id": "25544",
+      "name": "ISS SAMPLE",
+      "omm": {
+        "NORAD_CAT_ID": 25544,
+        "OBJECT_NAME": "ISS SAMPLE",
+        "EPOCH": "2025-03-26T06:00:00.000000",
+        "MEAN_MOTION": 15.50015342
+      }
+    }
+  ]
+}
+```
 
 ```json
 {

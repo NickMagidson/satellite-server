@@ -1,11 +1,12 @@
 import { X } from 'lucide-react'
-import type { SatelliteMetadata, SatellitePositionOk } from '../../lib/satelliteApi'
+import type { SatelliteMetadata } from '../../lib/satelliteApi'
 import { ORBIT_CLASS_LABELS } from '../../lib/satelliteApi'
+import type { SelectedPositionDetail } from '../../lib/satelliteMotion/types'
 import { Card, CardBody, CardHeader } from '../ui/Card'
 
 interface SatelliteDetailPanelProps {
   satellite: SatelliteMetadata
-  position?: SatellitePositionOk | null
+  position?: SelectedPositionDetail | null
   onClose: () => void
 }
 

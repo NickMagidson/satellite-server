@@ -4,36 +4,32 @@ import { useMemo, useState } from 'react'
 import CesiumViewer from '../components/CesiumViewer'
 import SatelliteDetailPanel from '../components/globe/SatelliteDetailPanel'
 import SearchInput from '../components/search/SearchInput'
-import { useSatellitePositions } from '../hooks/useSatellitePositions'
+import { useSatelliteMotionWorker } from '../hooks/useSatelliteMotionWorker'
 import { useSatelliteSearch } from '../hooks/useSatelliteSearch'
 import { useSatellites } from '../hooks/useSatellites'
 import type { SatelliteMetadata } from '../lib/satelliteApi'
-import { isSatellitePositionOk } from '../lib/satelliteApi'
 
 export const Route = createFileRoute('/')({ component: GlobePage })
 
 function GlobePage() {
   const [query, setQuery] = useState('')
   const [selectedSatellite, setSelectedSatellite] = useState<SatelliteMetadata | null>(null)
-  
-  const { data, isPending, isError, error } = useSatellitePositions()
+
+  const motion = useSatelliteMotionWorker()
   const satellitesQuery = useSatellites()
   const { results: searchResults } = useSatelliteSearch(query)
-  const okPositions = data?.positions.filter(isSatellitePositionOk) ?? []
   const satellites = satellitesQuery.data?.satellites ?? []
-  
+
   const satellitesById = useMemo(
     () => new Map(satellites.map((satellite) => [satellite.id, satellite])),
     [satellites],
   )
-  const dataError = error ?? satellitesQuery.error
-  const selectedSatellitePosition = useMemo(
-    () =>
-      selectedSatellite
-        ? okPositions.find((position) => position.id === selectedSatellite.id)
-        : null,
-    [okPositions, selectedSatellite],
-  )
+  const dataError = motion.error ?? satellitesQuery.error
+
+  const selectedPositionDetail =
+    selectedSatellite && motion.selectedDetail?.id === selectedSatellite.id
+      ? motion.selectedDetail
+      : null
 
   function handleSelectedEntityIdChange(entityId: string | null) {
     if (!entityId) {
@@ -43,9 +39,10 @@ function GlobePage() {
     }
 
     const satellite = satellitesById.get(entityId) ?? null
-    const position = okPositions.find((candidate) => candidate.id === entityId)
+    const nameFromMotion =
+      motion.nameByIndex[motion.indexById.get(entityId) ?? -1] ?? entityId
     setSelectedSatellite(satellite)
-    setQuery(satellite?.name ?? position?.name ?? '')
+    setQuery(satellite?.name ?? nameFromMotion)
   }
 
   return (
@@ -78,7 +75,7 @@ function GlobePage() {
         />
       </div>
 
-      {(isError || satellitesQuery.isError) && (
+      {(motion.isError || satellitesQuery.isError) && (
         <p className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-md border border-red-200 bg-white px-3 py-2 text-sm text-red-600 shadow-sm">
           {dataError instanceof Error
             ? dataError.message
@@ -98,7 +95,7 @@ function GlobePage() {
           {selectedSatellite ? (
             <SatelliteDetailPanel
               satellite={selectedSatellite}
-              position={selectedSatellitePosition}
+              position={selectedPositionDetail}
               onClose={() => {
                 setSelectedSatellite(null)
                 setQuery('')
@@ -108,15 +105,15 @@ function GlobePage() {
         </div>
       </Transition>
       <CesiumViewer
-        positions={okPositions}
+        motion={motion}
         selectedEntityId={selectedSatellite?.id ?? null}
         onSelectedEntityIdChange={handleSelectedEntityIdChange}
         className="h-full w-full"
       />
-      {(isPending || satellitesQuery.isPending) && (
+      {(motion.isPending || satellitesQuery.isPending) && (
         <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md bg-white px-3 py-2 text-sm text-slate-600 shadow-sm">
-          {isPending
-            ? 'Loading satellite positions...'
+          {motion.isPending
+            ? 'Loading satellite motion...'
             : 'Loading satellite catalog...'}
         </p>
       )}

@@ -31,6 +31,15 @@ export function createSatelliteRouter({ catalog, databaseUrl }: CreateSatelliteR
     }
   });
 
+  router.get('/elements', (req, res) => {
+    const elements = catalog.getElements();
+
+    res.json({
+      count: elements.length,
+      elements,
+    });
+  });
+
   router.get('/:id/position', (req: Request<{ id: string }>, res: Response, next) => {
     try {
       const at = parseOptionalDate(req.query.at);

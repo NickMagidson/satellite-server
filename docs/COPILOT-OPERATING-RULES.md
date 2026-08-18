@@ -35,7 +35,7 @@ Load [`ARCHITECTURE.md`](./ARCHITECTURE.md), [`DECISIONS.md`](./DECISIONS.md), a
 - Do not commit, push, or open PRs unless the user asks.
 - Do not add dependencies without clear need.
 - Do not refactor unrelated code.
-- Do not duplicate SGP4 or OMM validation on the frontend.
+- Do not duplicate OMM validation on the frontend; globe SGP4 belongs in the motion worker only.
 - Do not commit secrets or `.env` files.
 
 ## Delivery rules
