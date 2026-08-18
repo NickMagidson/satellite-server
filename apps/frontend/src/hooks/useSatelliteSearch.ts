@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import type { SatelliteMetadata } from '../lib/satelliteApi'
 import { useSatellites } from './useSatellites'
 
-export function useSatelliteSearch(query: string, limit = 8) {
+export function useSatelliteSearch(query: string, limit = 20) {
   const satellitesQuery = useSatellites()
 
   const results = useMemo(() => {

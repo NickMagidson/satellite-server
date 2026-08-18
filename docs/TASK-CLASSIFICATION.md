@@ -23,7 +23,7 @@ Work may start from a **GitHub issue** or a **direct prompt** — classification
 | Frontend UI change | `apps/frontend/src/components/`, shared layout | Core + [Linting](./skills/SKILL-LINTING.md), [Build](./skills/SKILL-BUILD.md) |
 | Routing change | `apps/frontend/src/routes/` | Core + [Linting](./skills/SKILL-LINTING.md), [Build](./skills/SKILL-BUILD.md) |
 | Data fetching (frontend) | `hooks/`, `lib/`, route loaders | Core + [Pattern lookup](./skills/SKILL-PATTERN-LOOKUP.md), [Linting](./skills/SKILL-LINTING.md), [Build](./skills/SKILL-BUILD.md) |
-| Cesium / globe change | `CesiumViewer.tsx`, `routes/globe.tsx` | Core + [Cesium viewer](./skills/SKILL-CESIUM-VIEWER-CHANGE.md), [Linting](./skills/SKILL-LINTING.md), [Build](./skills/SKILL-BUILD.md) |
+| Cesium / globe change | `CesiumViewer.tsx`, globe routes, motion worker, Cesium helpers | Core + [Cesium viewer](./skills/SKILL-CESIUM-VIEWER-CHANGE.md), [Using CesiumJS skills](./skills/CESIUM-SKILLS/using-cesiumjs-skills/SKILL.md), matching [CesiumJS domain skill(s)](./SKILLS.md#cesiumjs-domain-skills), [Linting](./skills/SKILL-LINTING.md), [Build](./skills/SKILL-BUILD.md) |
 | Satellite propagation / domain | `apps/api/src/services/` (propagation, catalog, OMM) | Core + [Propagation basics](./skills/SKILL-SATELLITE-PROPAGATION-BASICS.md), [Testing](./skills/SKILL-TESTING.md), [Build](./skills/SKILL-BUILD.md) |
 | Docker / infra change | `docker-compose*.yml`, `Makefile`, `Dockerfile` | Core + [Repository validation](./skills/SKILL-REPOSITORY-VALIDATION.md); smoke-test with `make dev` when behavior changes |
 | Repository tooling | root `package.json`, lint/CI config | Core + applicable validation skills for touched workspaces |

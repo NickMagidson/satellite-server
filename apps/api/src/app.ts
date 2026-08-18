@@ -1,4 +1,5 @@
 import cors from 'cors';
+import compression from 'compression';
 import express, { type ErrorRequestHandler, type Express } from 'express';
 import { HttpError } from './errors.js';
 import { createSatelliteRouter } from './routes/satellites.routes.js';
@@ -12,6 +13,7 @@ interface CreateAppOptions {
 export function createApp({ catalog, databaseUrl }: CreateAppOptions): Express {
   const app = express();
 
+  app.use(compression());
   app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true,

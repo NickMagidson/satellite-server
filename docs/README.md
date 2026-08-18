@@ -9,7 +9,8 @@ Structured AI development docs for Satellite Server. Start at [`.github/copilot-
 docs/COPILOT-OPERATING-RULES.md    Repo operating rules
 docs/TASK-CLASSIFICATION.md        What kind of task is this?
 docs/SKILLS.md                       Skill index
-docs/skills/*.md                     How to do specific work
+docs/skills/*.md                     Repo procedural skills
+docs/skills/CESIUM-SKILLS/           CesiumJS 1.143 domain skills
 docs/GUARDRAILS.md                   Hard safety rules
 docs/ARCHITECTURE.md                 Repo structure and data flow
 docs/DECISIONS.md                    Intentional design choices
@@ -27,7 +28,9 @@ For install, Docker, API endpoints, and OMM examples see the root [`README.md`](
 | Skill | Use for |
 |-------|---------|
 | [Satellite propagation basics](./skills/SKILL-SATELLITE-PROPAGATION-BASICS.md) | TLE, OMM, SGP4, coordinate frames |
-| [Cesium viewer change](./skills/SKILL-CESIUM-VIEWER-CHANGE.md) | Globe, camera, entities |
+| [Cesium viewer change](./skills/SKILL-CESIUM-VIEWER-CHANGE.md) | Globe integration in this app (API, React, coordinates) |
+| [Using CesiumJS skills](./skills/CESIUM-SKILLS/using-cesiumjs-skills/SKILL.md) | Orientation for CesiumJS API domain skills |
+| [CesiumJS domain skills](./SKILLS.md#cesiumjs-domain-skills) | Camera, entities, imagery, shaders, etc. (full index) |
 
 ## Maintenance
 
