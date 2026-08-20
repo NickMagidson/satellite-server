@@ -24,7 +24,8 @@ Intentional choices in this repository. Do not change these patterns unless the 
 | Server state | TanStack Query | Catalog/elements bootstrap; globe motion via worker buffers |
 | Styling | Tailwind CSS 4 | Via `@tailwindcss/vite` |
 | Globe | Cesium | Script-tag load + Vite asset plugin |
-| Dev orchestration | `concurrently` (host), Docker Compose (container) | `make dev` for full stack |
+| Dev orchestration | `concurrently` (host), Docker Compose dev (container) | `make dev` for Vite dev stack; `docker compose up` for production stack |
+| Frontend prod server | `srvx` (via TanStack Start) | `npm run start` after `npm run build` |
 
 ## Propagation and coordinates
 

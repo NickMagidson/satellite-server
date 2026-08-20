@@ -67,14 +67,20 @@ VITE_SATELLITE_PERF_LOGS=true npm --workspace apps/frontend run dev
 
 ## Run with Docker Compose
 
-Copy [`.env.example`](./.env.example) to `.env` and set at least `POSTGRES_PASSWORD` (and matching `DATABASE_URL`) for anything beyond local defaults. Then start the API and Postgres:
+Copy [`.env.example`](./.env.example) to `.env` and set at least `POSTGRES_PASSWORD` (and matching `DATABASE_URL`) for anything beyond local defaults. **Important:** `VITE_API_URL` and `VITE_CESIUM_ION_ACCESS_TOKEN` are baked into the frontend at build time, so set them before running `docker compose up --build`.
 
 ```sh
 cp .env.example .env
+# Edit .env: set POSTGRES_PASSWORD, VITE_API_URL (if not localhost:3000), etc.
 docker compose up -d --build
 curl http://localhost:3000/health
 docker compose ps
 ```
+
+The full compose stack includes:
+- **API** (`:3000`) — Express + SGP4 propagation + Postgres
+- **Frontend** (`:5173`) — TanStack Start SSR server with Cesium globe
+- **Postgres** (`:5432`) — persistent satellite catalog
 
 The compose setup defaults `OMM_FILE` to `/app/apps/api/data/omm.sample.json` inside the API container. On startup, the API loads OMM records from Postgres when rows exist in `omm_records`; when the database is configured but empty, it seeds from `OMM_FILE` first; otherwise it reads `OMM_FILE` directly. See [`docs/DECISIONS.md`](./docs/DECISIONS.md) for the full load sequence.
 
@@ -102,7 +108,9 @@ make clean
 make dev
 ```
 
-The API is exposed at `http://localhost:3000`, the frontend is exposed at `http://localhost:5173`, and Prisma Studio is available on demand at `http://localhost:5555` after running `make studio`. Inside the dev containers, Postgres is reachable at `postgres:5432` with `DATABASE_URL` from `.env` (default `postgresql://satellite:satellite@postgres:5432/satellite`). `make up`, `make down`, `make logs`, `make exec`, `make psql`, and `make studio` operate on the same dev stack. Use `make exec` when you need an interactive shell in the API container.
+The API is exposed at `http://localhost:3000`, the frontend (dev mode) is exposed at `http://localhost:5173`, and Prisma Studio is available on demand at `http://localhost:5555` after running `make studio`. Inside the dev containers, Postgres is reachable at `postgres:5432` with `DATABASE_URL` from `.env` (default `postgresql://satellite:satellite@postgres:5432/satellite`). `make up`, `make down`, `make logs`, `make exec`, `make psql`, and `make studio` operate on the dev stack (API + frontend Vite dev servers). Use `make exec` when you need an interactive shell in the API container.
+
+For **production Compose** (API + frontend + Postgres all in runtime mode), use `docker compose up -d --build` directly (not `make dev`). The production frontend runs TanStack Start's SSR server via `srvx`, not Vite dev.
 
 ## Database Migrations
 

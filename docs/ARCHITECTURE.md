@@ -11,9 +11,9 @@ satellite-server-monorepo/
 │   └── frontend/      TanStack Start + React — Cesium globe
 ├── packages/
 │   └── db/            Prisma schema + migrations (Postgres)
-├── docker-compose.yml         Production-oriented compose (api + postgres)
-├── docker-compose.dev.yml     Dev overrides (hot reload, frontend)
-├── Dockerfile
+├── docker-compose.yml         Production compose (api + frontend + postgres)
+├── docker-compose.dev.yml     Dev overrides (hot reload, Vite dev)
+├── Dockerfile                 Multi-stage: dev, build, api-runtime, frontend-runtime
 └── Makefile                   Docker dev workflow shortcuts
 ```
 
@@ -167,9 +167,9 @@ Compose project name: `satellite-server` (see `Makefile`).
 
 | Mode | Command | API | Frontend | Postgres |
 |------|---------|-----|----------|----------|
-| Host dev | `npm run dev` | `:3000` | `:5173` | optional (`DATABASE_URL`) |
-| Docker dev | `make dev` | `:3000` | `:5173` | compose service |
-| Compose (API + DB) | `docker compose up -d --build` | `:3000` | — | compose service |
+| Host dev | `npm run dev` | `:3000` | `:5173` (Vite dev) | optional (`DATABASE_URL`) |
+| Docker dev | `make dev` | `:3000` | `:5173` (Vite dev) | compose service |
+| Production Compose | `docker compose up -d --build` | `:3000` | `:5173` (TanStack Start SSR) | compose service |
 | API only | `npm --workspace apps/api start` | `:3000` | — | optional |
 
 CORS allows the origin in `CORS_ORIGIN` (default `http://localhost:5173`) on the API.
