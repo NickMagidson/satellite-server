@@ -31,9 +31,14 @@ CMD ["sh"]
 
 FROM dev AS build
 
+ARG VITE_API_URL=http://localhost:3000
+ARG VITE_CESIUM_ION_ACCESS_TOKEN=
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_CESIUM_ION_ACCESS_TOKEN=$VITE_CESIUM_ION_ACCESS_TOKEN
+
 RUN npm run build
 
-FROM node:24-alpine AS runtime
+FROM node:24-alpine AS api-runtime
 
 ENV NODE_ENV=production \
     PORT=3000 \
@@ -57,3 +62,24 @@ USER node
 EXPOSE 3000
 
 CMD ["npm", "--workspace", "apps/api", "start"]
+
+FROM node:24-alpine AS frontend-runtime
+
+ENV NODE_ENV=production \
+    PORT=5173
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY apps/frontend/package.json ./apps/frontend/package.json
+RUN npm ci --omit=dev --workspace apps/frontend && npm cache clean --force
+
+COPY --from=build /app/apps/frontend/dist ./apps/frontend/dist
+
+USER node
+
+EXPOSE 5173
+
+WORKDIR /app/apps/frontend
+
+CMD ["npm", "run", "start"]

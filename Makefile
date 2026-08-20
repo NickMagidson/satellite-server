@@ -30,7 +30,7 @@ exec: up ## open shell in api container
 	$(compose_dev) exec api sh
 
 psql: up ## open psql in postgres container
-	$(compose_dev) exec postgres psql -U satellite -d satellite
+	$(compose_dev) exec postgres psql -U $${POSTGRES_USER:-satellite} -d $${POSTGRES_DB:-satellite}
 
 studio: up ## open Prisma Studio at http://localhost:5555
 	$(compose_dev) exec api npm run db:studio
