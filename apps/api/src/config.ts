@@ -11,6 +11,7 @@ interface Config {
   updateIntervalMs: number;
   livePositionRefreshEnabled: boolean;
   databaseUrl: string | null;
+  corsOrigin: string;
 }
 
 function readBooleanEnv(name: string, defaultValue: boolean): boolean {
@@ -29,4 +30,5 @@ export const config: Config = {
   updateIntervalMs: Number(process.env.UPDATE_INTERVAL_MS ?? 1000),
   livePositionRefreshEnabled: readBooleanEnv('LIVE_POSITION_REFRESH_ENABLED', true),
   databaseUrl: process.env.DATABASE_URL?.trim() || null,
+  corsOrigin: process.env.CORS_ORIGIN?.trim() || 'http://localhost:5173',
 };

@@ -8,14 +8,19 @@ import type { SatelliteCatalog } from './services/satelliteCatalog.js';
 interface CreateAppOptions {
   catalog: SatelliteCatalog;
   databaseUrl: string | null;
+  corsOrigin?: string;
 }
 
-export function createApp({ catalog, databaseUrl }: CreateAppOptions): Express {
+export function createApp({
+  catalog,
+  databaseUrl,
+  corsOrigin = 'http://localhost:5173',
+}: CreateAppOptions): Express {
   const app = express();
 
   app.use(compression());
   app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: corsOrigin,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

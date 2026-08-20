@@ -7,7 +7,11 @@ const catalog = new SatelliteCatalog({
   updateIntervalMs: config.updateIntervalMs,
   liveRefreshEnabled: config.livePositionRefreshEnabled,
 });
-const app = createApp({ catalog, databaseUrl: config.databaseUrl });
+const app = createApp({
+  catalog,
+  databaseUrl: config.databaseUrl,
+  corsOrigin: config.corsOrigin,
+});
 
 loadInitialOmms({
   catalog,

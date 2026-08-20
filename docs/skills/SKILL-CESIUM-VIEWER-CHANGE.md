@@ -21,7 +21,7 @@ Safely adjust Cesium viewer behavior, entities, camera, or map-related UI in the
   - Successful positions include `geodetic` (lat/lon/alt km) and `ecf` (Earth-fixed Cartesian km). Prefer `ecf` for Cesium entity placement; convert km → m.
 - **Environment**
   - Frontend API base URL: `import.meta.env.VITE_API_URL` (defaults to `http://localhost:3000`)
-  - CORS on the API already allows `http://localhost:5173`
+  - CORS on the API uses `CORS_ORIGIN` (default `http://localhost:5173`)
 
 ### When to use this skill
 

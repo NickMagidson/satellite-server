@@ -67,15 +67,18 @@ VITE_SATELLITE_PERF_LOGS=true npm --workspace apps/frontend run dev
 
 ## Run with Docker Compose
 
-Copy `.env.example` to `.env` if you want to override the defaults, then start the API and Postgres:
+Copy [`.env.example`](./.env.example) to `.env` and set at least `POSTGRES_PASSWORD` (and matching `DATABASE_URL`) for anything beyond local defaults. Then start the API and Postgres:
 
 ```sh
+cp .env.example .env
 docker compose up -d --build
 curl http://localhost:3000/health
 docker compose ps
 ```
 
 The compose setup defaults `OMM_FILE` to `/app/apps/api/data/omm.sample.json` inside the API container. On startup, the API loads OMM records from Postgres when rows exist in `omm_records`; when the database is configured but empty, it seeds from `OMM_FILE` first; otherwise it reads `OMM_FILE` directly. See [`docs/DECISIONS.md`](./docs/DECISIONS.md) for the full load sequence.
+
+Set `CORS_ORIGIN` to your public frontend origin when the UI is not on `http://localhost:5173`. Compose defaults `LIVE_POSITION_REFRESH_ENABLED=false` so the API does not run the live position tick when the globe propagates from `/api/satellites/elements`.
 
 ## Make targets
 
@@ -99,7 +102,7 @@ make clean
 make dev
 ```
 
-The API is exposed at `http://localhost:3000`, the frontend is exposed at `http://localhost:5173`, and Prisma Studio is available on demand at `http://localhost:5555` after running `make studio`. Inside the dev containers, Postgres is reachable at `postgres:5432` with `DATABASE_URL=postgresql://satellite:satellite@postgres:5432/satellite`. `make up`, `make down`, `make logs`, `make exec`, `make psql`, and `make studio` operate on the same dev stack. Use `make exec` when you need an interactive shell in the API container.
+The API is exposed at `http://localhost:3000`, the frontend is exposed at `http://localhost:5173`, and Prisma Studio is available on demand at `http://localhost:5555` after running `make studio`. Inside the dev containers, Postgres is reachable at `postgres:5432` with `DATABASE_URL` from `.env` (default `postgresql://satellite:satellite@postgres:5432/satellite`). `make up`, `make down`, `make logs`, `make exec`, `make psql`, and `make studio` operate on the same dev stack. Use `make exec` when you need an interactive shell in the API container.
 
 ## Database Migrations
 

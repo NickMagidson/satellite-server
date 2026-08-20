@@ -21,6 +21,7 @@ services:
       LIVE_POSITION_REFRESH_ENABLED: ${LIVE_POSITION_REFRESH_ENABLED:-false}
       OMM_FILE: ${OMM_FILE:-/app/apps/api/data/omm.sample.json}
       DATABASE_URL: ${DATABASE_URL:-postgresql://satellite:satellite@postgres:5432/satellite}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
     ports:
       - "${PORT:-3000}:${PORT:-3000}"
     depends_on:
@@ -30,13 +31,13 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: satellite
-      POSTGRES_PASSWORD: satellite
-      POSTGRES_DB: satellite
+      POSTGRES_USER: ${POSTGRES_USER:-satellite}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-satellite}
+      POSTGRES_DB: ${POSTGRES_DB:-satellite}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U satellite -d satellite"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-satellite} -d ${POSTGRES_DB:-satellite}"]
       interval: 10s
       timeout: 5s
       retries: 5

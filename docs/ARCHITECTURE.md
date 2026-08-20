@@ -43,7 +43,7 @@ Express HTTP server. Entry: `src/server.ts` → `createApp()` in `src/app.ts`.
 
 **Dev server:** `npm run dev` uses `tsx watch src/server.ts` (TypeScript direct, no compile step).
 
-**Config** (`src/config.ts`): `PORT`, `OMM_FILE`, `UPDATE_INTERVAL_MS`, `DATABASE_URL`.
+**Config** (`src/config.ts`): `PORT`, `OMM_FILE`, `UPDATE_INTERVAL_MS`, `DATABASE_URL`, `CORS_ORIGIN`.
 
 ### `apps/frontend`
 
@@ -128,7 +128,12 @@ Errors: `HttpError` / `ValidationError` → JSON `{ error, details? }` with appr
 | `PORT` | `3000` | API listen port |
 | `OMM_FILE` | `apps/api/data/omm.sample.json` | Starter OMM JSON path |
 | `UPDATE_INTERVAL_MS` | `1000` | Position cache refresh interval |
+| `LIVE_POSITION_REFRESH_ENABLED` | `true` (host); Compose defaults `false` | API live position cache tick |
 | `DATABASE_URL` | unset (optional) | Prisma / Postgres; enables persistence |
+| `CORS_ORIGIN` | `http://localhost:5173` | Allowed browser origin for API CORS |
+| `POSTGRES_USER` | `satellite` | Compose Postgres user |
+| `POSTGRES_PASSWORD` | `satellite` | Compose Postgres password — change for production |
+| `POSTGRES_DB` | `satellite` | Compose Postgres database name |
 | `VITE_API_URL` | `http://localhost:3000` | Frontend → API base URL |
 | `VITE_CESIUM_ION_ACCESS_TOKEN` | unset | Cesium Ion imagery/terrain |
 | `FRONTEND_PORT` | `5173` | Docker dev frontend port |
@@ -167,7 +172,7 @@ Compose project name: `satellite-server` (see `Makefile`).
 | Compose (API + DB) | `docker compose up -d --build` | `:3000` | — | compose service |
 | API only | `npm --workspace apps/api start` | `:3000` | — | optional |
 
-CORS allows `http://localhost:5173` on the API.
+CORS allows the origin in `CORS_ORIGIN` (default `http://localhost:5173`) on the API.
 
 ## Testing architecture
 

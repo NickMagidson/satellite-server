@@ -53,7 +53,7 @@ Intentional choices in this repository. Do not change these patterns unless the 
 | Error type | `HttpError` / `ValidationError` with optional `details` |
 | Validation | Centralized in `ommValidation.ts` before catalog ingest |
 | JSON body limit | 5 MB (`express.json`) |
-| CORS | Local frontend origin only (`http://localhost:5173`) |
+| CORS | `CORS_ORIGIN` env (default `http://localhost:5173`) |
 
 ## Frontend design
 
