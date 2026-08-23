@@ -100,7 +100,7 @@ function GlobePage() {
       <div className="absolute left-4 top-4 z-10 flex w-96 items-start gap-2">
         <SearchInput
           className="min-w-0 flex-1"
-          inputClassName="rounded-full border-white/10 focus-visible:ring-cyan-400/60"
+          inputClassName="h-10 rounded-full border-white/10 focus-visible:ring-cyan-400/60"
           panelClassName="z-30"
           options={searchResults}
           value={selectedSatellite}
@@ -132,7 +132,7 @@ function GlobePage() {
         <button
           type="button"
           onClick={() => cesiumViewerRef.current?.recenter()}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-slate-950/85 text-slate-200 shadow-lg backdrop-blur transition hover:bg-slate-800 hover:text-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+          className="flex size-10 shrink-0 items-center justify-center rounded-sm border border-white/10 bg-slate-950/85 text-slate-200 shadow-lg backdrop-blur transition hover:bg-slate-800 hover:text-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
           title="Re-center globe"
           aria-label="Re-center globe"
         >
