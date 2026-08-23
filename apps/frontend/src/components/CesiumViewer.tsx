@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react'
 import type { SatelliteMotionHandle } from '../hooks/useSatelliteMotionWorker'
 import { GLOBE_START_VIEW } from '../lib/cesiumCamera'
 import type { CameraState } from '../lib/satelliteMotion/types'
@@ -142,6 +142,10 @@ interface StoredHomeView {
   }
 }
 
+export interface CesiumViewerHandle {
+  recenter: () => void
+}
+
 function buildStartViewOptions(Cesium: CesiumNamespace): StoredHomeView {
   const { destination, orientation } = GLOBE_START_VIEW
 
@@ -243,22 +247,27 @@ function loadCesium(): Promise<CesiumNamespace> {
   })
 }
 
-export default function CesiumViewer({
-  motion,
-  selectedEntityId = null,
-  onSelectedEntityIdChange,
-  className,
-}: CesiumViewerProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const viewerRef = useRef<CesiumViewerInstance | null>(null)
-  const cesiumApiRef = useRef<CesiumNamespace | null>(null)
-  const pointsRef = useRef<Map<string, CesiumPointPrimitive>>(new Map())
-  const selectionEntityRef = useRef<CesiumSelectionEntity | null>(null)
-  const pointCollectionRef = useRef<CesiumPointPrimitiveCollection | null>(null)
-  const onSelectedEntityIdChangeRef = useRef(onSelectedEntityIdChange)
-  const motionRef = useRef(motion)
-  const selectedEntityIdRef = useRef(selectedEntityId)
-  const [viewerReady, setViewerReady] = useState(false)
+const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
+  function CesiumViewer(
+    {
+      motion,
+      selectedEntityId = null,
+      onSelectedEntityIdChange,
+      className,
+    },
+    ref,
+  ) {
+    const containerRef = useRef<HTMLDivElement>(null)
+    const viewerRef = useRef<CesiumViewerInstance | null>(null)
+    const cesiumApiRef = useRef<CesiumNamespace | null>(null)
+    const pointsRef = useRef<Map<string, CesiumPointPrimitive>>(new Map())
+    const selectionEntityRef = useRef<CesiumSelectionEntity | null>(null)
+    const pointCollectionRef = useRef<CesiumPointPrimitiveCollection | null>(null)
+    const onSelectedEntityIdChangeRef = useRef(onSelectedEntityIdChange)
+    const motionRef = useRef(motion)
+    const selectedEntityIdRef = useRef(selectedEntityId)
+    const homeViewRef = useRef<StoredHomeView | null>(null)
+    const [viewerReady, setViewerReady] = useState(false)
 
   useEffect(() => {
     onSelectedEntityIdChangeRef.current = onSelectedEntityIdChange
@@ -271,6 +280,27 @@ export default function CesiumViewer({
   useEffect(() => {
     selectedEntityIdRef.current = selectedEntityId
   }, [selectedEntityId])
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      recenter: () => {
+        const viewer = viewerRef.current
+        const Cesium = cesiumApiRef.current
+
+        if (!viewer || !Cesium) {
+          return
+        }
+
+        if (!homeViewRef.current) {
+          homeViewRef.current = buildStartViewOptions(Cesium)
+        }
+
+        applyStartView(viewer, homeViewRef.current)
+      },
+    }),
+    [],
+  )
 
   useEffect(() => {
     let cancelled = false
@@ -310,7 +340,8 @@ export default function CesiumViewer({
       viewerRef.current = viewer
       cesiumApiRef.current = Cesium
 
-      applyStartView(viewer, buildStartViewOptions(Cesium))
+      homeViewRef.current = buildStartViewOptions(Cesium)
+      applyStartView(viewer, homeViewRef.current)
 
       viewer.scene.skyBox = new Cesium.SkyBox({
         sources: { ...NASA_DEEP_SPACE_SKYBOX },
@@ -578,4 +609,8 @@ export default function CesiumViewer({
   }, [viewerReady, motion.indexById, motion.setSelectedIndex, selectedEntityId])
 
   return <div ref={containerRef} className={className} />
-}
+})
+
+CesiumViewer.displayName = 'CesiumViewer'
+
+export default CesiumViewer

@@ -1,7 +1,8 @@
 import { Transition } from '@headlessui/react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useMemo, useState } from 'react'
-import CesiumViewer from '../components/CesiumViewer'
+import { Home } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import CesiumViewer, { type CesiumViewerHandle } from '../components/CesiumViewer'
 import SatelliteFilterPanel from '../components/filters/SatelliteFilterPanel'
 import SatelliteDetailPanel from '../components/globe/SatelliteDetailPanel'
 import SearchInput from '../components/search/SearchInput'
@@ -23,6 +24,7 @@ export const Route = createFileRoute('/')({ component: GlobePage })
 function GlobePage() {
   const [query, setQuery] = useState('')
   const [selectedSatellite, setSelectedSatellite] = useState<SatelliteMetadata | null>(null)
+  const cesiumViewerRef = useRef<CesiumViewerHandle>(null)
 
   const satellitesQuery = useSatellites()
   const satellites = satellitesQuery.data?.satellites ?? []
@@ -126,6 +128,15 @@ function GlobePage() {
           onChange={setFilters}
           onReset={resetFilters}
         />
+        <button
+          type="button"
+          onClick={() => cesiumViewerRef.current?.recenter()}
+          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white text-slate-600 shadow-lg transition hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+          title="Re-center globe"
+          aria-label="Re-center globe"
+        >
+          <Home className="size-4" aria-hidden="true" />
+        </button>
       </div>
 
       {(motion.isError || satellitesQuery.isError) && (
@@ -158,6 +169,7 @@ function GlobePage() {
         </div>
       </Transition>
       <CesiumViewer
+        ref={cesiumViewerRef}
         motion={motion}
         selectedEntityId={selectedSatellite?.id ?? null}
         onSelectedEntityIdChange={handleSelectedEntityIdChange}
