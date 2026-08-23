@@ -31,6 +31,10 @@ interface CesiumCartesian3 {
   z: number
 }
 
+interface CesiumSkyBox {
+  show: boolean
+}
+
 interface CesiumScene {
   pick: (windowPosition: unknown) => { id?: unknown } | undefined
   primitives: {
@@ -39,6 +43,7 @@ interface CesiumScene {
   }
   preRender: CesiumEvent
   requestRender: () => void
+  skyBox?: CesiumSkyBox
   skyAtmosphere?: { show: boolean }
   fog?: { enabled: boolean }
   moon?: { show: boolean }
@@ -93,6 +98,16 @@ interface CesiumNamespace {
     element: HTMLElement,
     options: Record<string, unknown>,
   ) => CesiumViewerInstance
+  SkyBox: new (options: {
+    sources: {
+      positiveX: string
+      negativeX: string
+      positiveY: string
+      negativeY: string
+      positiveZ: string
+      negativeZ: string
+    }
+  }) => CesiumSkyBox
   Cartesian3: {
     new (x: number, y: number, z: number): CesiumCartesian3
     fromDegrees: (longitude: number, latitude: number, height: number) => unknown
@@ -161,8 +176,18 @@ const CESIUM_SCRIPT_ID = 'cesium-script'
 const CESIUM_STYLE_ID = 'cesium-style'
 const CESIUM_SCRIPT_SRC = '/cesium/Cesium.js'
 const CESIUM_STYLE_HREF = '/cesium/Widgets/widgets.css'
-const SATELLITE_POINT_SIZE = 3
+const SATELLITE_POINT_SIZE = 2
 const CAMERA_THROTTLE_MS = 100
+
+/** NASA Tycho Catalog Skymap (SVS) as a 2K cube map — denser than Cesium's default stars. */
+const NASA_DEEP_SPACE_SKYBOX = {
+  positiveX: '/skybox/tycho_px.jpg',
+  negativeX: '/skybox/tycho_mx.jpg',
+  positiveY: '/skybox/tycho_py.jpg',
+  negativeY: '/skybox/tycho_my.jpg',
+  positiveZ: '/skybox/tycho_pz.jpg',
+  negativeZ: '/skybox/tycho_mz.jpg',
+} as const
 
 function ensureCesiumStylesheet(): void {
   if (document.getElementById(CESIUM_STYLE_ID)) {
@@ -287,6 +312,10 @@ export default function CesiumViewer({
 
       applyStartView(viewer, buildStartViewOptions(Cesium))
 
+      viewer.scene.skyBox = new Cesium.SkyBox({
+        sources: { ...NASA_DEEP_SPACE_SKYBOX },
+      })
+
       if (viewer.scene.skyAtmosphere) {
         viewer.scene.skyAtmosphere.show = false
       }
@@ -304,6 +333,8 @@ export default function CesiumViewer({
         viewer.scene.globe.showGroundAtmosphere = false
         viewer.scene.globe.maximumScreenSpaceError = 4
       }
+
+      viewer.scene.requestRender()
 
       const pointCollection = new Cesium.PointPrimitiveCollection()
       viewer.scene.primitives.add(pointCollection)
@@ -500,9 +531,9 @@ export default function CesiumViewer({
           id,
           position: cartesian,
           pixelSize: SATELLITE_POINT_SIZE,
-          color: Cesium.Color.CYAN,
+          color: Cesium.Color.WHITE,
           // outlineColor: Cesium.Color.WHITE,
-          outlineWidth: 1,
+          // outlineWidth: 1,
         })
         points.set(id, point)
       }

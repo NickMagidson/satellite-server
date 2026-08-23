@@ -1,13 +1,22 @@
 import { Transition } from '@headlessui/react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import CesiumViewer from '../components/CesiumViewer'
+import SatelliteFilterPanel from '../components/filters/SatelliteFilterPanel'
 import SatelliteDetailPanel from '../components/globe/SatelliteDetailPanel'
 import SearchInput from '../components/search/SearchInput'
+import { useFilterState } from '../hooks/useFilterState'
 import { useSatelliteMotionWorker } from '../hooks/useSatelliteMotionWorker'
 import { useSatelliteSearch } from '../hooks/useSatelliteSearch'
 import { useSatellites } from '../hooks/useSatellites'
 import type { SatelliteMetadata } from '../lib/satelliteApi'
+import {
+  applyFilters,
+  extractUniqueCountryCodes,
+  extractUniqueObjectTypes,
+  extractUniqueOrbitClasses,
+  reconcileFiltersWithCatalog,
+} from '../lib/satelliteFilters'
 
 export const Route = createFileRoute('/')({ component: GlobePage })
 
@@ -15,10 +24,37 @@ function GlobePage() {
   const [query, setQuery] = useState('')
   const [selectedSatellite, setSelectedSatellite] = useState<SatelliteMetadata | null>(null)
 
-  const motion = useSatelliteMotionWorker()
   const satellitesQuery = useSatellites()
-  const { results: searchResults } = useSatelliteSearch(query)
   const satellites = satellitesQuery.data?.satellites ?? []
+  const { filters, setFilters, resetFilters, isHydrated } = useFilterState()
+  const effectiveFilters = useMemo(
+    () => reconcileFiltersWithCatalog(filters, satellites),
+    [filters, satellites],
+  )
+  const filteredSatellites = useMemo(
+    () => applyFilters(satellites, effectiveFilters),
+    [effectiveFilters, satellites],
+  )
+  const visibleSatelliteIds = useMemo(
+    () =>
+      isHydrated && satellitesQuery.isSuccess
+        ? new Set(filteredSatellites.map((satellite) => satellite.id))
+        : null,
+    [filteredSatellites, isHydrated, satellitesQuery.isSuccess],
+  )
+  const filterOptions = useMemo(
+    () => ({
+      orbitClasses: extractUniqueOrbitClasses(satellites),
+      objectTypes: extractUniqueObjectTypes(satellites),
+      countryCodes: extractUniqueCountryCodes(satellites),
+    }),
+    [satellites],
+  )
+  const motion = useSatelliteMotionWorker(visibleSatelliteIds)
+  const { results: searchResults } = useSatelliteSearch(
+    query,
+    filteredSatellites,
+  )
 
   const satellitesById = useMemo(
     () => new Map(satellites.map((satellite) => [satellite.id, satellite])),
@@ -30,6 +66,17 @@ function GlobePage() {
     selectedSatellite && motion.selectedDetail?.id === selectedSatellite.id
       ? motion.selectedDetail
       : null
+
+  useEffect(() => {
+    if (
+      selectedSatellite &&
+      visibleSatelliteIds &&
+      !visibleSatelliteIds.has(selectedSatellite.id)
+    ) {
+      setSelectedSatellite(null)
+      setQuery('')
+    }
+  }, [selectedSatellite, visibleSatelliteIds])
 
   function handleSelectedEntityIdChange(entityId: string | null) {
     if (!entityId) {
@@ -47,9 +94,9 @@ function GlobePage() {
 
   return (
     <main className="globe-main relative w-full overflow-hidden bg-slate-950">
-      <div className="absolute left-4 top-4 z-10">
+      <div className="absolute left-4 top-4 z-10 flex w-96 items-start gap-2">
         <SearchInput
-          className="w-80"
+          className="min-w-0 flex-1"
           inputClassName="rounded-full border-white/20 shadow-lg focus-visible:ring-white/80"
           panelClassName="z-30"
           options={searchResults}
@@ -72,6 +119,12 @@ function GlobePage() {
             `NORAD ${satellite.noradCatId} · ${satellite.id}`
           }
           placeholder="Search satellites..."
+        />
+        <SatelliteFilterPanel
+          filters={effectiveFilters}
+          options={filterOptions}
+          onChange={setFilters}
+          onReset={resetFilters}
         />
       </div>
 
@@ -117,6 +170,14 @@ function GlobePage() {
             : 'Loading satellite catalog...'}
         </p>
       )}
+      {!motion.isPending &&
+        !satellitesQuery.isPending &&
+        satellites.length > 0 &&
+        filteredSatellites.length === 0 && (
+          <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md bg-white px-3 py-2 text-sm text-slate-600 shadow-sm">
+            No satellites match these filters.
+          </p>
+        )}
     </main>
   )
 }

@@ -12,6 +12,7 @@ import type {
   WorkerToMainMessage,
 } from '../lib/satelliteMotion/types'
 import { fetchSatelliteElements } from '../lib/satelliteApi'
+import { filterByVisibleIds } from '../lib/satelliteFilters'
 import { logSatellitePerf } from '../lib/perfLogging'
 import { useSatellites } from './useSatellites'
 
@@ -48,7 +49,9 @@ function catalogIdentity(elements: SatelliteElement[]): string {
   return elements.map((element) => element.id).join(',')
 }
 
-export function useSatelliteMotionWorker(): SatelliteMotionHandle {
+export function useSatelliteMotionWorker(
+  visibleSatelliteIds: ReadonlySet<string> | null,
+): SatelliteMotionHandle {
   const elementsQuery = useQuery({
     queryKey: ['satellite-elements'],
     queryFn: async () => {
@@ -75,7 +78,16 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
   const [isReady, setIsReady] = useState(false)
   const [workerError, setWorkerError] = useState<Error | null>(null)
 
-  const elements = elementsQuery.data?.elements ?? []
+  const elements = useMemo(() => {
+    if (visibleSatelliteIds === null) {
+      return []
+    }
+
+    return filterByVisibleIds(
+      elementsQuery.data?.elements ?? [],
+      visibleSatelliteIds,
+    )
+  }, [elementsQuery.data?.elements, visibleSatelliteIds])
   const count = elements.length
 
   const idByIndex = useMemo(() => elements.map((element) => element.id), [elements])
@@ -91,10 +103,13 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
     return map
   }, [elements])
 
-  const catalogKey = useMemo(() => {
-    const catalogCount = satellitesQuery.data?.count ?? count
-    return `${catalogCount}:${catalogIdentity(elements)}`
-  }, [count, elements, satellitesQuery.data?.count])
+  const catalogKey = useMemo(
+    () =>
+      visibleSatelliteIds === null
+        ? null
+        : `${count}:${catalogIdentity(elements)}`,
+    [count, elements, visibleSatelliteIds],
+  )
 
   const setCameraState = useCallback((camera: CameraState) => {
     const worker = workerRef.current
@@ -125,12 +140,13 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
   }, [satellitesQuery.dataUpdatedAt, refetchElements])
 
   useEffect(() => {
-    const catalogElements = elementsQuery.data?.elements
+    const catalogElements = visibleSatelliteIds === null ? null : elements
 
     if (!elementsQuery.isSuccess || !catalogElements) {
       bufferRef.current = null
       correctionTimeRef.current = null
       setIsReady(false)
+      setSelectedDetail(null)
       return
     }
 
@@ -139,6 +155,7 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
       correctionTimeRef.current = null
       setIsReady(true)
       setWorkerError(null)
+      setSelectedDetail(null)
       return
     }
 
@@ -229,7 +246,12 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
       idleCorrectionTimeRef.current = null
       setIsReady(false)
     }
-  }, [catalogKey, elementsQuery.data, elementsQuery.isSuccess])
+  }, [
+    catalogKey,
+    elements,
+    elementsQuery.isSuccess,
+    visibleSatelliteIds,
+  ])
 
   const error =
     workerError ??
@@ -246,7 +268,10 @@ export function useSatelliteMotionWorker(): SatelliteMotionHandle {
     setSelectedIndex,
     selectedDetail,
     isReady,
-    isPending: elementsQuery.isPending || (count > 0 && !isReady && !error),
+    isPending:
+      visibleSatelliteIds === null ||
+      elementsQuery.isPending ||
+      (count > 0 && !isReady && !error),
     isError: Boolean(error) || elementsQuery.isError,
     error,
   }

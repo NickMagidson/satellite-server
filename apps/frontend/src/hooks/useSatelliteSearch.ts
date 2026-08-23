@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 import type { SatelliteMetadata } from '../lib/satelliteApi'
-import { useSatellites } from './useSatellites'
 
-export function useSatelliteSearch(query: string, limit = 20) {
-  const satellitesQuery = useSatellites()
-
+export function useSatelliteSearch(
+  query: string,
+  satellites: SatelliteMetadata[],
+  limit = 20,
+) {
   const results = useMemo(() => {
     const search = query.trim().toLowerCase()
-    const satellites = satellitesQuery.data?.satellites ?? []
 
     if (!search) {
       return satellites.slice(0, limit)
@@ -16,12 +16,9 @@ export function useSatelliteSearch(query: string, limit = 20) {
     return satellites
       .filter((satellite) => matchesSatellite(satellite, search))
       .slice(0, limit)
-  }, [limit, query, satellitesQuery.data?.satellites])
+  }, [limit, query, satellites])
 
-  return {
-    ...satellitesQuery,
-    results,
-  }
+  return { results }
 }
 
 function matchesSatellite(satellite: SatelliteMetadata, search: string) {
