@@ -1,0 +1,36 @@
+# Railway configuration for Satellite Server monorepo
+# https://docs.railway.app/reference/config-as-code
+
+# This file defines build and deployment settings for Railway.
+# You'll need to create TWO services in Railway:
+# 1. "satellite-api" - Backend API service
+# 2. "satellite-frontend" - Frontend web service
+
+# API Service Configuration
+[[services]]
+name = "satellite-api"
+# Build from the api-runtime stage in Dockerfile
+dockerTarget = "api-runtime"
+
+[services.startCommand]
+command = "npm --workspace apps/api start"
+
+[[services.healthcheck]]
+path = "/health"
+timeout = 60
+
+[[services.volumes]]
+mountPath = "/app/apps/api/data"
+
+# Frontend Service Configuration
+[[services]]
+name = "satellite-frontend"
+# Build from the frontend-runtime stage in Dockerfile
+dockerTarget = "frontend-runtime"
+
+[services.startCommand]
+command = "npm --workspace apps/frontend run start"
+
+[[services.healthcheck]]
+path = "/"
+timeout = 60

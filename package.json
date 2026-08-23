@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm --workspace apps/api run build && npm --workspace apps/frontend run build",
+    "build": "npm --workspace apps/api run build && echo '✓ API build complete' && npm --workspace apps/frontend run build && echo '✓ Frontend build complete'",
     "db:generate": "npm --workspace packages/db run prisma:generate",
     "db:migrate": "npm --workspace packages/db run prisma:migrate",
     "db:migrate:deploy": "npm --workspace packages/db run prisma:migrate:deploy",
