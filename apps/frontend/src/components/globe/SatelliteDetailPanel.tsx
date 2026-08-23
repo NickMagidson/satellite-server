@@ -40,10 +40,10 @@ function formatDate(value: string | null | undefined) {
 function DetailRow({ label, value }: DetailRowProps) {
   return (
     <div className="flex items-start justify-between gap-4">
-      <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+      <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">
         {label}
       </dt>
-      <dd className="min-w-0 text-right text-sm text-slate-700">
+      <dd className="min-w-0 text-right text-sm text-slate-200">
         {value ?? 'N/A'}
       </dd>
     </div>
@@ -59,13 +59,13 @@ export default function SatelliteDetailPanel({
     <Card aria-label="Satellite details" className="overflow-hidden">
       <CardHeader className="flex items-start justify-between gap-3 p-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-cyan-600">
+          <p className="text-xs font-medium uppercase tracking-wide text-cyan-400">
             Selected satellite
           </p>
-          <h2 className="mt-1 truncate text-base font-semibold text-slate-950">
+          <h2 className="mt-1 truncate text-base font-semibold text-slate-50">
             {satellite.name}
           </h2>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-slate-400">
             NORAD {satellite.noradCatId}
           </p>
         </div>
@@ -74,7 +74,7 @@ export default function SatelliteDetailPanel({
           type="button"
           aria-label="Close satellite details"
           onClick={onClose}
-          className="rounded-full p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+          className="rounded-full p-1 text-slate-400 transition hover:bg-slate-800 hover:text-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
         >
           <X className="size-4" aria-hidden="true" />
         </button>
@@ -82,7 +82,7 @@ export default function SatelliteDetailPanel({
 
       <CardBody className="space-y-4 p-3">
         <section>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Catalog
           </h3>
           <dl className="mt-2 space-y-2">
@@ -98,7 +98,7 @@ export default function SatelliteDetailPanel({
         </section>
 
         <section>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Orbit details
           </h3>
           <dl className="mt-2 space-y-2">
@@ -134,7 +134,7 @@ export default function SatelliteDetailPanel({
         </section>
 
         <section>
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Current position
           </h3>
           {position ? (
@@ -157,7 +157,7 @@ export default function SatelliteDetailPanel({
               />
             </dl>
           ) : (
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-slate-400">
               No current propagated position is visible for this satellite.
             </p>
           )}

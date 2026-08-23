@@ -4,6 +4,12 @@
 @theme {
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-surface: #020617;
+  --color-surface-raised: #0f172a;
+  --color-border: #334155;
+  --color-ink: #f1f5f9;
+  --color-ink-muted: #94a3b8;
 }
 
 html,
@@ -12,10 +18,14 @@ body,
   min-height: 100%;
 }
 
+html {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
-  background: #ffffff;
-  color: #0f172a;
+  background: var(--color-surface);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;

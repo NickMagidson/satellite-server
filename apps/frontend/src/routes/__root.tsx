@@ -48,7 +48,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="font-sans wrap-anywhere antialiased selection:bg-slate-200">
+      <body className="font-sans wrap-anywhere antialiased selection:bg-cyan-500/30">
         <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
         <Scripts />
       </body>

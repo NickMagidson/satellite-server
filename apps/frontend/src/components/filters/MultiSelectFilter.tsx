@@ -37,7 +37,7 @@ export default function MultiSelectFilter<TValue extends string>({
   return (
     <Popover className="relative">
       <PopoverButton
-        className="group flex w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-left text-sm text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+        className="group flex w-full items-center justify-between rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-left text-sm text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
         aria-label={`${label}: ${selected.length === 0 ? 'Any' : `${selected.length} selected`}`}
       >
         <span>{selected.length === 0 ? 'Any' : `${selected.length} selected`}</span>
@@ -49,25 +49,25 @@ export default function MultiSelectFilter<TValue extends string>({
 
       <PopoverPanel
         anchor="bottom start"
-        className="z-40 mt-1 w-(--button-width) rounded-md border border-slate-200 bg-white p-2 shadow-lg"
+        className="z-40 mt-1 w-(--button-width) rounded-md border border-slate-700 bg-slate-950 p-2 shadow-lg"
       >
         <div className="max-h-52 space-y-1 overflow-y-auto">
           {options.map((option) => (
             <Field
               key={option.value}
-              className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-slate-100"
+              className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-slate-800"
             >
               <Checkbox
                 checked={selected.includes(option.value)}
                 onChange={(checked) => toggleValue(option.value, checked)}
-                className="group flex size-4 shrink-0 items-center justify-center rounded border border-slate-300 bg-white data-checked:border-cyan-600 data-checked:bg-cyan-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+                className="group flex size-4 shrink-0 items-center justify-center rounded border border-slate-600 bg-slate-900 data-checked:border-cyan-500 data-checked:bg-cyan-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
               >
                 <Check
-                  className="hidden size-3 text-white group-data-checked:block"
+                  className="hidden size-3 text-slate-950 group-data-checked:block"
                   aria-hidden="true"
                 />
               </Checkbox>
-              <Label className="min-w-0 flex-1 cursor-pointer text-sm text-slate-700">
+              <Label className="min-w-0 flex-1 cursor-pointer text-sm text-slate-200">
                 {option.label}
               </Label>
             </Field>
@@ -78,7 +78,7 @@ export default function MultiSelectFilter<TValue extends string>({
           <button
             type="button"
             onClick={() => onChange([])}
-            className="mt-2 w-full border-t border-slate-200 pt-2 text-left text-xs font-medium text-cyan-700 hover:text-cyan-900 focus:outline-none focus-visible:underline"
+            className="mt-2 w-full border-t border-slate-700 pt-2 text-left text-xs font-medium text-cyan-400 hover:text-cyan-300 focus:outline-none focus-visible:underline"
           >
             Clear filter
           </button>

@@ -2,7 +2,8 @@ import { Transition } from '@headlessui/react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Home } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import CesiumViewer, { type CesiumViewerHandle } from '../components/CesiumViewer'
+import CesiumViewer from '../components/CesiumViewer'
+import type { CesiumViewerHandle } from '../components/CesiumViewer'
 import SatelliteFilterPanel from '../components/filters/SatelliteFilterPanel'
 import SatelliteDetailPanel from '../components/globe/SatelliteDetailPanel'
 import SearchInput from '../components/search/SearchInput'
@@ -99,7 +100,7 @@ function GlobePage() {
       <div className="absolute left-4 top-4 z-10 flex w-96 items-start gap-2">
         <SearchInput
           className="min-w-0 flex-1"
-          inputClassName="rounded-full border-white/20 shadow-lg focus-visible:ring-white/80"
+          inputClassName="rounded-full border-white/10 focus-visible:ring-cyan-400/60"
           panelClassName="z-30"
           options={searchResults}
           value={selectedSatellite}
@@ -131,7 +132,7 @@ function GlobePage() {
         <button
           type="button"
           onClick={() => cesiumViewerRef.current?.recenter()}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white text-slate-600 shadow-lg transition hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-slate-950/85 text-slate-200 shadow-lg backdrop-blur transition hover:bg-slate-800 hover:text-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
           title="Re-center globe"
           aria-label="Re-center globe"
         >
@@ -140,7 +141,7 @@ function GlobePage() {
       </div>
 
       {(motion.isError || satellitesQuery.isError) && (
-        <p className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-md border border-red-200 bg-white px-3 py-2 text-sm text-red-600 shadow-sm">
+        <p className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-md border border-red-500/40 bg-slate-950/90 px-3 py-2 text-sm text-red-300 shadow-sm backdrop-blur">
           {dataError instanceof Error
             ? dataError.message
             : 'Failed to load satellite data.'}
@@ -176,7 +177,7 @@ function GlobePage() {
         className="h-full w-full"
       />
       {(motion.isPending || satellitesQuery.isPending) && (
-        <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md bg-white px-3 py-2 text-sm text-slate-600 shadow-sm">
+        <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md border border-slate-700/80 bg-slate-950/90 px-3 py-2 text-sm text-slate-300 shadow-sm backdrop-blur">
           {motion.isPending
             ? 'Loading satellite motion...'
             : 'Loading satellite catalog...'}
@@ -186,7 +187,7 @@ function GlobePage() {
         !satellitesQuery.isPending &&
         satellites.length > 0 &&
         filteredSatellites.length === 0 && (
-          <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md bg-white px-3 py-2 text-sm text-slate-600 shadow-sm">
+          <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md border border-slate-700/80 bg-slate-950/90 px-3 py-2 text-sm text-slate-300 shadow-sm backdrop-blur">
             No satellites match these filters.
           </p>
         )}

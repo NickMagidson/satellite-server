@@ -42,7 +42,7 @@ export default function SearchInput<TOption>({
   renderOption,
   placeholder = 'Search...',
   emptyMessage = 'No results found.',
-  leadingIcon = <Search className="size-4" aria-hidden="true" />,
+  leadingIcon = <Search className="size-4 text-slate-300" aria-hidden="true" />,
   className,
   inputClassName,
   panelClassName,
@@ -64,12 +64,12 @@ export default function SearchInput<TOption>({
     >
       <div className={cx('relative', className)}>
         <div className="relative">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-slate-300">
             {leadingIcon}
           </span>
           <ComboboxInput
             className={cx(
-              'block w-full rounded-md border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-950 placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 data-disabled:cursor-not-allowed data-disabled:bg-slate-50 data-disabled:text-slate-400',
+              'block w-full rounded-md border border-slate-700 bg-slate-950/90 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-500 shadow-lg backdrop-blur focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 data-disabled:cursor-not-allowed data-disabled:bg-slate-900 data-disabled:text-slate-500',
               inputClassName,
             )}
             displayValue={(option: TOption | null) =>
@@ -82,12 +82,12 @@ export default function SearchInput<TOption>({
 
         <ComboboxOptions
           className={cx(
-            'absolute z-20 mt-2 max-h-72 w-full overflow-auto rounded-md border border-slate-200 bg-white p-1 text-sm shadow-lg focus:outline-none',
+            'absolute z-20 mt-2 max-h-72 w-full overflow-auto rounded-md border border-slate-700 bg-slate-950/95 p-1 text-sm shadow-lg backdrop-blur focus:outline-none',
             panelClassName,
           )}
         >
           {showEmptyMessage ? (
-            <div className="px-3 py-2 text-slate-500">{emptyMessage}</div>
+            <div className="px-3 py-2 text-slate-400">{emptyMessage}</div>
           ) : (
             options.map((option) => (
               <ComboboxOption
@@ -95,9 +95,9 @@ export default function SearchInput<TOption>({
                 value={option}
                 className={({ focus, selected }) =>
                   cx(
-                    'cursor-pointer rounded px-3 py-2 text-slate-700 data-disabled:cursor-not-allowed data-disabled:text-slate-400',
-                    focus && 'bg-slate-100 text-slate-950',
-                    selected && 'font-medium text-slate-950',
+                    'cursor-pointer rounded px-3 py-2 text-slate-300 data-disabled:cursor-not-allowed data-disabled:text-slate-500',
+                    focus && 'bg-slate-800 text-slate-50',
+                    selected && 'font-medium text-slate-50',
                     optionClassName,
                   )
                 }

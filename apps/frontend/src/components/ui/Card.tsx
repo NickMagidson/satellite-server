@@ -15,7 +15,7 @@ function Card({ className, ...props }: CardProps) {
   return (
     <section
       className={cx(
-        'rounded-xl border border-slate-200 bg-white text-slate-950 shadow-xl',
+        'rounded-xl border border-slate-700/80 bg-slate-950/90 text-slate-100 shadow-xl backdrop-blur',
         className,
       )}
       {...props}
@@ -25,7 +25,7 @@ function Card({ className, ...props }: CardProps) {
 
 function CardHeader({ children, className }: CardSectionProps) {
   return (
-    <div className={cx('border-b border-slate-200 p-4', className)}>
+    <div className={cx('border-b border-slate-700/80 p-4', className)}>
       {children}
     </div>
   )
@@ -37,7 +37,7 @@ function CardBody({ children, className }: CardSectionProps) {
 
 function CardFooter({ children, className }: CardSectionProps) {
   return (
-    <div className={cx('border-t border-slate-200 p-4', className)}>
+    <div className={cx('border-t border-slate-700/80 p-4', className)}>
       {children}
     </div>
   )
