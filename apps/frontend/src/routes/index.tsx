@@ -24,7 +24,8 @@ export const Route = createFileRoute('/')({ component: GlobePage })
 
 function GlobePage() {
   const [query, setQuery] = useState('')
-  const [selectedSatellite, setSelectedSatellite] = useState<SatelliteMetadata | null>(null)
+  const [selectedSatellite, setSelectedSatellite] =
+    useState<SatelliteMetadata | null>(null)
   const cesiumViewerRef = useRef<CesiumViewerHandle>(null)
 
   const satellitesQuery = useSatellites()

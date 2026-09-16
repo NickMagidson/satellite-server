@@ -1,9 +1,5 @@
 import { eciToEcf, gstime } from 'satellite.js'
-import {
-  FLAG_VALID,
-  hasFlag,
-  readEciState,
-} from './bufferLayout'
+import { FLAG_VALID, hasFlag, readEciState } from './bufferLayout'
 
 export interface EciVectorKm {
   x: number

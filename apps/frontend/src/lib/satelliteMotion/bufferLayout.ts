@@ -28,7 +28,8 @@ export function allocateCorrectionTimeBuffer(count: number): Float64Array {
 }
 
 export function getFlags(buffer: Float32Array, satelliteIndex: number): number {
-  const offset = (buffer.byteOffset + bufferIndex(satelliteIndex, FLAGS) * 4) >>> 0
+  const offset =
+    (buffer.byteOffset + bufferIndex(satelliteIndex, FLAGS) * 4) >>> 0
   return new Uint32Array(buffer.buffer, offset, 1)[0]
 }
 
@@ -37,7 +38,8 @@ export function setFlags(
   satelliteIndex: number,
   flags: number,
 ): void {
-  const offset = (buffer.byteOffset + bufferIndex(satelliteIndex, FLAGS) * 4) >>> 0
+  const offset =
+    (buffer.byteOffset + bufferIndex(satelliteIndex, FLAGS) * 4) >>> 0
   new Uint32Array(buffer.buffer, offset, 1)[0] = flags >>> 0
 }
 

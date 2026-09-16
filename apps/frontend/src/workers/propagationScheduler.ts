@@ -6,7 +6,11 @@ export const OFFSCREEN_MIN_INTERVAL_MS = 2000
 export const OFFSCREEN_MAX_INTERVAL_MS = 4000
 export const IN_FOV_HALF_ANGLE_RAD = (45 * Math.PI) / 180
 
-export type PropagationTier = 'selected' | 'in_fov' | 'offscreen' | 'below_horizon'
+export type PropagationTier =
+  | 'selected'
+  | 'in_fov'
+  | 'offscreen'
+  | 'below_horizon'
 
 export interface EcfKm {
   x: number
@@ -14,7 +18,11 @@ export interface EcfKm {
   z: number
 }
 
-function normalize(x: number, y: number, z: number): [number, number, number] | null {
+function normalize(
+  x: number,
+  y: number,
+  z: number,
+): [number, number, number] | null {
   const length = Math.hypot(x, y, z)
   if (length === 0) {
     return null

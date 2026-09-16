@@ -90,7 +90,10 @@ export function useSatelliteMotionWorker(
   }, [elementsQuery.data?.elements, visibleSatelliteIds])
   const count = elements.length
 
-  const idByIndex = useMemo(() => elements.map((element) => element.id), [elements])
+  const idByIndex = useMemo(
+    () => elements.map((element) => element.id),
+    [elements],
+  )
   const nameByIndex = useMemo(
     () => elements.map((element) => element.name),
     [elements],
@@ -223,7 +226,9 @@ export function useSatelliteMotionWorker(
     }
 
     worker.onerror = (event) => {
-      setWorkerError(new Error(event.message || 'Satellite motion worker failed.'))
+      setWorkerError(
+        new Error(event.message || 'Satellite motion worker failed.'),
+      )
     }
 
     postToWorker(
@@ -246,12 +251,7 @@ export function useSatelliteMotionWorker(
       idleCorrectionTimeRef.current = null
       setIsReady(false)
     }
-  }, [
-    catalogKey,
-    elements,
-    elementsQuery.isSuccess,
-    visibleSatelliteIds,
-  ])
+  }, [catalogKey, elements, elementsQuery.isSuccess, visibleSatelliteIds])
 
   const error =
     workerError ??

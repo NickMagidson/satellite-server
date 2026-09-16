@@ -27,7 +27,8 @@ function uniqueStrings(value: unknown): string[] {
   return [
     ...new Set(
       value.filter(
-        (item): item is string => typeof item === 'string' && item.trim() !== '',
+        (item): item is string =>
+          typeof item === 'string' && item.trim() !== '',
       ),
     ),
   ]
@@ -89,9 +90,9 @@ export function extractUniqueOrbitClasses(
 }
 
 function extractUniqueStrings(values: Array<string | null>): string[] {
-  return [...new Set(values.filter((value): value is string => Boolean(value)))].sort(
-    (first, second) => first.localeCompare(second),
-  )
+  return [
+    ...new Set(values.filter((value): value is string => Boolean(value))),
+  ].sort((first, second) => first.localeCompare(second))
 }
 
 export function extractUniqueObjectTypes(
@@ -119,9 +120,13 @@ export function reconcileFiltersWithCatalog(
   const countryCodes = new Set(extractUniqueCountryCodes(satellites))
 
   return {
-    orbitClasses: filters.orbitClasses.filter((value) => orbitClasses.has(value)),
+    orbitClasses: filters.orbitClasses.filter((value) =>
+      orbitClasses.has(value),
+    ),
     objectTypes: filters.objectTypes.filter((value) => objectTypes.has(value)),
-    countryCodes: filters.countryCodes.filter((value) => countryCodes.has(value)),
+    countryCodes: filters.countryCodes.filter((value) =>
+      countryCodes.has(value),
+    ),
   }
 }
 
@@ -137,7 +142,8 @@ export function applyFilters(
     (satellite) =>
       (orbitClasses.size === 0 || orbitClasses.has(satellite.orbitClass)) &&
       (objectTypes.size === 0 ||
-        (satellite.objectType !== null && objectTypes.has(satellite.objectType))) &&
+        (satellite.objectType !== null &&
+          objectTypes.has(satellite.objectType))) &&
       (countryCodes.size === 0 ||
         (satellite.countryCode !== null &&
           countryCodes.has(satellite.countryCode))),

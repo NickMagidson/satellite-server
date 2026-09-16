@@ -21,14 +21,14 @@ npm --workspace apps/frontend run dev
 
 Run from repo root with `--workspace apps/frontend`:
 
-| Script | Purpose |
-|--------|---------|
-| `dev` | Vite dev server (`:5173`) |
-| `build` | Production bundle |
-| `lint` | ESLint |
+| Script   | Purpose                     |
+| -------- | --------------------------- |
+| `dev`    | Vite dev server (`:5173`)   |
+| `build`  | Production bundle           |
+| `lint`   | ESLint                      |
 | `format` | Prettier write + ESLint fix |
-| `check` | Prettier check |
-| `test` | Vitest |
+| `check`  | Prettier check              |
+| `test`   | Vitest                      |
 
 ## Key paths
 

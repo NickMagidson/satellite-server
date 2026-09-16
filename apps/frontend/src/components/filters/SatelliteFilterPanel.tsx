@@ -1,8 +1,4 @@
-import {
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-} from '@headlessui/react'
+import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import { SlidersHorizontal } from 'lucide-react'
 import { ORBIT_CLASS_LABELS } from '../../lib/satelliteApi'
 import type { OrbitClass } from '../../lib/satelliteApi'
@@ -81,7 +77,9 @@ export default function SatelliteFilterPanel({
                 label: ORBIT_CLASS_LABELS[orbitClass],
               }))}
               selected={filters.orbitClasses}
-              onChange={(orbitClasses) => onChange({ ...filters, orbitClasses })}
+              onChange={(orbitClasses) =>
+                onChange({ ...filters, orbitClasses })
+              }
             />
           </div>
 
@@ -111,7 +109,9 @@ export default function SatelliteFilterPanel({
                 label: countryCode,
               }))}
               selected={filters.countryCodes}
-              onChange={(countryCodes) => onChange({ ...filters, countryCodes })}
+              onChange={(countryCodes) =>
+                onChange({ ...filters, countryCodes })
+              }
             />
           </div>
         </div>

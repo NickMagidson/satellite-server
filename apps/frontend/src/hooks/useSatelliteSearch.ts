@@ -27,5 +27,9 @@ function matchesSatellite(satellite: SatelliteMetadata, search: string) {
     satellite.name,
     satellite.noradCatId,
     satellite.objectId,
-  ].some((value) => String(value ?? '').toLowerCase().includes(search))
+  ].some((value) =>
+    String(value ?? '')
+      .toLowerCase()
+      .includes(search),
+  )
 }

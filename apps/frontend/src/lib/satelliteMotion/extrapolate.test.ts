@@ -47,13 +47,7 @@ describe('flag helpers', () => {
 describe('positionFromMotionBuffer', () => {
   it('returns null when VALID is unset', () => {
     const buffer = allocateMotionBuffer(1)
-    writeEciState(
-      buffer,
-      0,
-      { x: 1, y: 2, z: 3 },
-      { x: 0, y: 0, z: 0 },
-      0,
-    )
+    writeEciState(buffer, 0, { x: 1, y: 2, z: 3 }, { x: 0, y: 0, z: 0 }, 0)
 
     expect(
       positionFromMotionBuffer(buffer, 0, 0, new Date('2025-03-26T06:00:00Z')),

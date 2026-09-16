@@ -109,13 +109,7 @@ function writeEntry(
     flags |= FLAG_IN_FOV
   }
 
-  writeEciState(
-    buffer,
-    index,
-    entry.eci.position,
-    entry.eci.velocity,
-    flags,
-  )
+  writeEciState(buffer, index, entry.eci.position, entry.eci.velocity, flags)
 }
 
 function publishBuffer(
@@ -126,10 +120,10 @@ function publishBuffer(
   writeCorrectionTime = null
   waitingForBuffer = true
 
-  post(
-    { type: 'BUFFER', buffer, correctionTime },
-    [buffer.buffer, correctionTime.buffer],
-  )
+  post({ type: 'BUFFER', buffer, correctionTime }, [
+    buffer.buffer,
+    correctionTime.buffer,
+  ])
 }
 
 function maybePostSelectedDetail(date: Date, atMs: number): void {

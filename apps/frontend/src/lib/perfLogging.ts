@@ -1,5 +1,9 @@
 function readBooleanEnv(value: unknown): boolean {
-  return ['1', 'true', 'yes', 'on'].includes(String(value ?? '').trim().toLowerCase())
+  return ['1', 'true', 'yes', 'on'].includes(
+    String(value ?? '')
+      .trim()
+      .toLowerCase(),
+  )
 }
 
 export function satellitePerfLoggingEnabled(): boolean {
