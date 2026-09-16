@@ -1,3 +1,8 @@
+# API production image for Railway.
+# Railway always builds the last stage and does not support `docker build --target`.
+# Keep stages aligned with the `dev` → `build` → `api-runtime` path in ./Dockerfile.
+# Local Compose continues to use ./Dockerfile with `--target api-runtime`.
+
 FROM node:24-alpine AS dev
 
 ENV NODE_ENV=development \
@@ -61,33 +66,4 @@ USER node
 
 EXPOSE 3000
 
-# Avoid `npm --workspace` at runtime — Railway and slim images can lack a
-# resolvable workspace graph even when the monorepo root package.json is present.
 CMD ["node", "apps/api/dist/server.js"]
-
-FROM node:24-alpine AS frontend-runtime
-
-ENV NODE_ENV=production \
-    PORT=5173
-
-WORKDIR /app
-
-COPY package*.json ./
-COPY apps/frontend/package.json ./apps/frontend/package.json
-RUN npm ci --omit=dev --workspace apps/frontend && npm cache clean --force
-
-COPY --from=build /app/apps/frontend/dist ./apps/frontend/dist
-
-USER node
-
-EXPOSE 5173
-
-WORKDIR /app/apps/frontend
-
-CMD ["npm", "run", "start"]
-
-# Railway cannot pass `docker build --target`. The final stage below is what
-# Railway builds by default when using this Dockerfile (API). For the frontend
-# service, use Dockerfile.frontend instead (see railway.frontend.toml).
-ARG RUNTIME_TARGET=api-runtime
-FROM ${RUNTIME_TARGET} AS railway-runtime

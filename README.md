@@ -112,6 +112,24 @@ The API is exposed at `http://localhost:3000`, the frontend (dev mode) is expose
 
 For **production Compose** (API + frontend + Postgres all in runtime mode), use `docker compose up -d --build` directly (not `make dev`). The production frontend runs TanStack Start's SSR server via `srvx`, not Vite dev.
 
+## Deploy on Railway
+
+This is an npm workspaces monorepo. Each Railway service must use the **repo root** as its root directory (not `apps/api` or `apps/frontend`), and must build with the matching Dockerfile. Railway cannot pass `docker build --target`, so dedicated Dockerfiles exist for each service.
+
+| Service | Config-as-code file | Dockerfile |
+|---------|---------------------|------------|
+| API | `railway.api.toml` | `Dockerfile.api` |
+| Frontend | `railway.frontend.toml` | `Dockerfile.frontend` |
+
+For each service in the Railway dashboard:
+
+1. Set **Root Directory** to empty / `/` (monorepo root).
+2. Set the **Config-as-code** path to `railway.api.toml` or `railway.frontend.toml`.
+3. Clear any custom start command that uses `npm --workspace=...` (the toml pins `node apps/api/dist/server.js` for the API).
+4. Provide `DATABASE_URL` (and other API env vars) on the API service; set `VITE_API_URL` / `VITE_CESIUM_ION_ACCESS_TOKEN` as build-time variables on the frontend service.
+
+Local Compose continues to use the multi-stage `Dockerfile` with `--target api-runtime` / `frontend-runtime`.
+
 ## Database Migrations
 
 Prisma lives in `packages/db`. Run migrations from the compose dev container so the default `DATABASE_URL` points at the compose Postgres service:

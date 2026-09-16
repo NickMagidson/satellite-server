@@ -68,8 +68,8 @@ fi
 echo ""
 
 echo -e "${BLUE}Step 7: Docker Build Tests${NC}"
-echo -e "${YELLOW}7️⃣  Building API Docker image (target: api-runtime)...${NC}"
-if docker build --target api-runtime -t satellite-api:test . > /tmp/api-build.log 2>&1; then
+echo -e "${YELLOW}7️⃣  Building API Docker image (Dockerfile.api for Railway)...${NC}"
+if docker build -f Dockerfile.api -t satellite-api:test . > /tmp/api-build.log 2>&1; then
     echo -e "${GREEN}✅ API Docker build successful${NC}"
 else
     echo -e "${RED}❌ API Docker build failed. Check /tmp/api-build.log for details${NC}"
@@ -77,14 +77,14 @@ else
 fi
 echo ""
 
-echo -e "${YELLOW}7️⃣  Building Frontend Docker image (target: frontend-runtime)...${NC}"
+echo -e "${YELLOW}7️⃣  Building Frontend Docker image (Dockerfile.frontend for Railway)...${NC}"
 if [ -z "$VITE_CESIUM_ION_ACCESS_TOKEN" ]; then
     echo -e "${YELLOW}⚠️  Warning: VITE_CESIUM_ION_ACCESS_TOKEN not set${NC}"
     echo -e "${YELLOW}   Using placeholder token for build test${NC}"
     VITE_CESIUM_ION_ACCESS_TOKEN="placeholder_for_build_test"
 fi
 
-if docker build --target frontend-runtime \
+if docker build -f Dockerfile.frontend \
     --build-arg VITE_API_URL=http://localhost:3000 \
     --build-arg VITE_CESIUM_ION_ACCESS_TOKEN="${VITE_CESIUM_ION_ACCESS_TOKEN}" \
     -t satellite-frontend:test . > /tmp/frontend-build.log 2>&1; then
