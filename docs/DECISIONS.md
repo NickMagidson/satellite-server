@@ -65,7 +65,7 @@ Intentional choices in this repository. Do not change these patterns unless the 
 | **Globe motion** | `useSatelliteMotionWorker` + `satelliteMotion.worker.ts`; frame updates in `scene.preRender` |
 | **Data fetching** | **TanStack Query hooks** for catalog/elements — not TanStack Router route `loader`s |
 | **Backend API** | **Express on `:3000`** — not TanStack Start server API routes under `src/routes/api/` |
-| Cesium load | Dynamic script + minimal `Window.Cesium` typing — avoids bundling entire Cesium into main chunk |
+| Cesium load | Dynamic script + minimal `Window.Cesium` typing — avoids bundling entire Cesium into main chunk. Dev serves `/cesium/` from the Vite plugin. Production loads that same build from jsDelivr so the app server does not send the uncompressed Cesium script |
 | Theme | `localStorage` + `prefers-color-scheme`; `light` / `dark` / `auto` |
 | REST position polling | `useSatellitePositions` remains for non-globe consumers; globe does not use it |
 

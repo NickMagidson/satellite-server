@@ -41,6 +41,15 @@ interface CesiumSkyBox {
   show: boolean
 }
 
+interface CesiumSkyBoxSources {
+  positiveX: string | ImageBitmap
+  negativeX: string | ImageBitmap
+  positiveY: string | ImageBitmap
+  negativeY: string | ImageBitmap
+  positiveZ: string | ImageBitmap
+  negativeZ: string | ImageBitmap
+}
+
 interface CesiumScene {
   pick: (windowPosition: unknown) => { id?: unknown } | undefined
   primitives: {
@@ -95,6 +104,7 @@ interface CesiumViewerInstance {
   selectedEntity: CesiumEntity | undefined
   trackedEntity: CesiumEntity | undefined
   destroy: () => void
+  isDestroyed: () => boolean
 }
 
 interface CesiumNamespace {
@@ -104,16 +114,10 @@ interface CesiumNamespace {
     element: HTMLElement,
     options: Record<string, unknown>,
   ) => CesiumViewerInstance
-  SkyBox: new (options: {
-    sources: {
-      positiveX: string
-      negativeX: string
-      positiveY: string
-      negativeY: string
-      positiveZ: string
-      negativeZ: string
-    }
-  }) => CesiumSkyBox
+  SkyBox: {
+    new (options: { sources: CesiumSkyBoxSources }): CesiumSkyBox
+    createEarthSkyBox: () => CesiumSkyBox
+  }
   Cartesian3: {
     new (x: number, y: number, z: number): CesiumCartesian3
     fromDegrees: (
@@ -135,6 +139,8 @@ declare global {
     Cesium?: CesiumNamespace
   }
 }
+
+declare const __CESIUM_RUNTIME_BASE__: string
 
 interface CesiumViewerProps {
   motion: SatelliteMotionHandle
@@ -195,8 +201,8 @@ function cameraStateFromViewer(viewer: CesiumViewerInstance): CameraState {
 
 const CESIUM_SCRIPT_ID = 'cesium-script'
 const CESIUM_STYLE_ID = 'cesium-style'
-const CESIUM_SCRIPT_SRC = '/cesium/Cesium.js'
-const CESIUM_STYLE_HREF = '/cesium/Widgets/widgets.css'
+const CESIUM_SCRIPT_SRC = `${__CESIUM_RUNTIME_BASE__}Cesium.js`
+const CESIUM_STYLE_HREF = `${__CESIUM_RUNTIME_BASE__}Widgets/widgets.css`
 const SATELLITE_POINT_SIZE = 2
 const CAMERA_THROTTLE_MS = 100
 
@@ -209,6 +215,41 @@ const NASA_DEEP_SPACE_SKYBOX = {
   positiveZ: '/skybox/tycho_pz.jpg',
   negativeZ: '/skybox/tycho_mz.jpg',
 } as const
+
+async function loadSkyBoxFace(url: string): Promise<ImageBitmap> {
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Skybox request failed (${response.status}): ${url}`)
+  }
+
+  // Match Cesium's loadCubeMap: flip during decode, then CubeMap flips again.
+  return createImageBitmap(await response.blob(), {
+    imageOrientation: 'flipY',
+    premultiplyAlpha: 'none',
+    colorSpaceConversion: 'default',
+  })
+}
+
+async function loadNasaSkyBoxSources(): Promise<CesiumSkyBoxSources> {
+  const [positiveX, negativeX, positiveY, negativeY, positiveZ, negativeZ] =
+    await Promise.all([
+      loadSkyBoxFace(NASA_DEEP_SPACE_SKYBOX.positiveX),
+      loadSkyBoxFace(NASA_DEEP_SPACE_SKYBOX.negativeX),
+      loadSkyBoxFace(NASA_DEEP_SPACE_SKYBOX.positiveY),
+      loadSkyBoxFace(NASA_DEEP_SPACE_SKYBOX.negativeY),
+      loadSkyBoxFace(NASA_DEEP_SPACE_SKYBOX.positiveZ),
+      loadSkyBoxFace(NASA_DEEP_SPACE_SKYBOX.negativeZ),
+    ])
+
+  return {
+    positiveX,
+    negativeX,
+    positiveY,
+    negativeY,
+    positiveZ,
+    negativeZ,
+  }
+}
 
 function ensureCesiumStylesheet(): void {
   if (document.getElementById(CESIUM_STYLE_ID)) {
@@ -357,9 +398,25 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
         homeViewRef.current = buildStartViewOptions(Cesium)
         applyStartView(viewer, homeViewRef.current)
 
-        viewer.scene.skyBox = new Cesium.SkyBox({
-          sources: { ...NASA_DEEP_SPACE_SKYBOX },
-        })
+        // Default stars render immediately. The NASA cube is six 2048² JPEGs
+        // served by the app, and Cesium draws nothing until every face is
+        // decoded — with the atmosphere hidden, that gap is a black sky.
+        viewer.scene.skyBox = Cesium.SkyBox.createEarthSkyBox()
+        void loadNasaSkyBoxSources()
+          .then((sources) => {
+            if (cancelled || viewer.isDestroyed()) {
+              return
+            }
+
+            viewer.scene.skyBox = new Cesium.SkyBox({ sources })
+            viewer.scene.requestRender()
+          })
+          .catch((error: unknown) => {
+            console.warn(
+              'NASA skybox failed; keeping the default starfield.',
+              error,
+            )
+          })
 
         if (viewer.scene.skyAtmosphere) {
           viewer.scene.skyAtmosphere.show = false

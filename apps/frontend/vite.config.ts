@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -16,6 +17,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '../..')
 const cesiumPath = path.join(repoRoot, 'node_modules/cesium/Build/Cesium')
 const cesiumBaseUrl = 'cesium'
+const require = createRequire(import.meta.url)
+const cesiumVersion = (
+  require(path.join(repoRoot, 'node_modules/cesium/package.json')) as {
+    version: string
+  }
+).version
+const cesiumCdnBase = `https://cdn.jsdelivr.net/npm/cesium@${cesiumVersion}/Build/Cesium/`
 
 function cesiumAssetsPlugin(): Plugin {
   let isBuild = false
@@ -24,9 +32,14 @@ function cesiumAssetsPlugin(): Plugin {
     name: 'cesium-assets',
     config(_config, { command }) {
       isBuild = command === 'build'
+      // Production loads the prebuilt Cesium script, workers, and default
+      // starfield from jsDelivr. The free Render instance was serving the
+      // uncompressed 5.6MB Cesium.js itself, which took over a minute.
+      const runtimeBase = isBuild ? cesiumCdnBase : `/${cesiumBaseUrl}/`
       return {
         define: {
           CESIUM_BASE_URL: JSON.stringify(`/${cesiumBaseUrl}/`),
+          __CESIUM_RUNTIME_BASE__: JSON.stringify(runtimeBase),
         },
       }
     },
