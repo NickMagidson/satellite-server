@@ -1,3 +1,8 @@
+# Frontend production image for Railway.
+# Railway always builds the last stage and does not support `docker build --target`.
+# Keep stages aligned with the `dev` → `build` → `frontend-runtime` path in ./Dockerfile.
+# Local Compose continues to use ./Dockerfile with `--target frontend-runtime`.
+
 FROM node:24-alpine AS dev
 
 ENV NODE_ENV=development \
@@ -38,33 +43,6 @@ ENV VITE_CESIUM_ION_ACCESS_TOKEN=$VITE_CESIUM_ION_ACCESS_TOKEN
 
 RUN npm run build
 
-FROM node:24-alpine AS api-runtime
-
-ENV NODE_ENV=production \
-    PORT=3000 \
-    UPDATE_INTERVAL_MS=1000 \
-    OMM_FILE=/app/apps/api/data/omm.sample.json
-
-WORKDIR /app
-
-COPY package*.json ./
-COPY apps/api/package.json ./apps/api/package.json
-COPY packages/db/package.json ./packages/db/package.json
-RUN npm ci --omit=dev --workspace apps/api && npm cache clean --force
-
-COPY --from=build /app/apps/api/dist ./apps/api/dist
-COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=build /app/node_modules/@prisma/client ./node_modules/@prisma/client
-COPY apps/api/data ./apps/api/data
-
-USER node
-
-EXPOSE 3000
-
-# Avoid `npm --workspace` at runtime — Railway and slim images can lack a
-# resolvable workspace graph even when the monorepo root package.json is present.
-CMD ["node", "apps/api/dist/server.js"]
-
 FROM node:24-alpine AS frontend-runtime
 
 ENV NODE_ENV=production \
@@ -85,9 +63,3 @@ EXPOSE 5173
 WORKDIR /app/apps/frontend
 
 CMD ["npm", "run", "start"]
-
-# Railway cannot pass `docker build --target`. The final stage below is what
-# Railway builds by default when using this Dockerfile (API). For the frontend
-# service, use Dockerfile.frontend instead (see railway.frontend.toml).
-ARG RUNTIME_TARGET=api-runtime
-FROM ${RUNTIME_TARGET} AS railway-runtime

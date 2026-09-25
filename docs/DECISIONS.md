@@ -76,6 +76,8 @@ Intentional choices in this repository. Do not change these patterns unless the 
 | Compose project name | `satellite-server` (via Makefile) |
 | Migrate on compose up | `migrate` service runs `db:migrate:deploy` before API starts |
 | Prisma Studio | Port `5555`; `make studio` |
+| Railway | Separate `Dockerfile.api` / `Dockerfile.frontend` + `railway.api.toml` / `railway.frontend.toml` (Railway cannot pass Docker `--target`) |
+| API container start | `node apps/api/dist/server.js` (not `npm --workspace`) |
 
 ## Explicit non-goals (for now)
 
