@@ -17,6 +17,7 @@ import type {
 } from '../lib/satelliteMotion/types'
 import type { EcfKm } from './propagationScheduler'
 import { isInFov, shouldRunSgp4 } from './propagationScheduler'
+import { hasPassedDragDecay } from './sgp4Decay'
 
 const SELECTED_DETAIL_INTERVAL_MS = 500
 
@@ -70,7 +71,7 @@ function runSgp4(entry: WorkerSatellite, date: Date, atMs: number): boolean {
   const pv = satellite.propagate(entry.satrec, date)
   entry.lastSgp4Ms = atMs
 
-  if (!pv?.position) {
+  if (!pv?.position || hasPassedDragDecay(entry.satrec)) {
     entry.lastEcfKm = null
     entry.eci = null
     return false

@@ -51,6 +51,36 @@ describe('SatelliteCatalog', () => {
     ]);
   });
 
+  it('excludes short-period orbits with apoapsis above 2000 km from LEO', () => {
+    const catalog = new SatelliteCatalog({ updateIntervalMs: 1000 });
+
+    catalog.loadOmms([
+      {
+        ...validOmm,
+        NORAD_CAT_ID: 1,
+        MEAN_MOTION: 11.29910959,
+        ECCENTRICITY: 0.188317,
+        PERIOD: undefined,
+        APOAPSIS: undefined,
+      },
+      { ...validOmm, NORAD_CAT_ID: 2, APOAPSIS: 3590.553 },
+      {
+        ...validOmm,
+        NORAD_CAT_ID: 3,
+        MEAN_MOTION: 12.5,
+        ECCENTRICITY: 0.001,
+        PERIOD: undefined,
+        APOAPSIS: undefined,
+      },
+    ]);
+
+    expect(catalog.getSatellites().map((satellite) => satellite.orbitClass)).toEqual([
+      'MEO',
+      'MEO',
+      'LEO',
+    ]);
+  });
+
   it('updates and returns the current position snapshot', () => {
     const catalog = new SatelliteCatalog({ updateIntervalMs: 5000 });
     const date = new Date(validOmm.EPOCH);

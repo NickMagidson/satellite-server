@@ -12,6 +12,9 @@ import type {
 } from '../types.js';
 
 const DEFAULT_UPDATE_INTERVAL_MS = 1000;
+const EARTH_MU_KM3_PER_S2 = 398600.4418;
+const EARTH_RADIUS_KM = 6378.137;
+const LEO_MAX_APOAPSIS_KM = 2000;
 
 interface SatelliteCatalogOptions {
   updateIntervalMs?: number;
@@ -52,6 +55,18 @@ function getOrbitalPeriodMin(omm: NormalizedOmmRecord): number {
   return getNullableNumber(omm.PERIOD) ?? 1440 / omm.MEAN_MOTION;
 }
 
+function getApoapsisKm(omm: NormalizedOmmRecord): number {
+  const apoapsisKm = getNullableNumber(omm.APOAPSIS);
+
+  if (apoapsisKm !== null) {
+    return apoapsisKm;
+  }
+
+  const periodSec = getOrbitalPeriodMin(omm) * 60;
+  const semiMajorAxisKm = Math.cbrt(EARTH_MU_KM3_PER_S2 * (periodSec / (2 * Math.PI)) ** 2);
+  return semiMajorAxisKm * (1 + omm.ECCENTRICITY) - EARTH_RADIUS_KM;
+}
+
 function classifyOrbit(omm: NormalizedOmmRecord): OrbitClass {
   const eccentricity = omm.ECCENTRICITY;
   const periodMin = getOrbitalPeriodMin(omm);
@@ -60,7 +75,7 @@ function classifyOrbit(omm: NormalizedOmmRecord): OrbitClass {
     return 'HEO';
   }
 
-  if (periodMin < 128) {
+  if (periodMin < 128 && getApoapsisKm(omm) < LEO_MAX_APOAPSIS_KM) {
     return 'LEO';
   }
 

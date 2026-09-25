@@ -28,6 +28,27 @@ export const validOmm: NormalizedOmmRecord = {
   MEAN_MOTION_DDOT: 0,
 };
 
+/** High-drag LEO elements that decay roughly 7 days after epoch. */
+export const highDragOmm: NormalizedOmmRecord = {
+  ...validOmm,
+  OBJECT_NAME: 'STARLINK-34709',
+  OBJECT_ID: '2025-152C',
+  EPOCH: '2026-08-18T06:00:02.000160',
+  NORAD_CAT_ID: 64844,
+  MEAN_MOTION: 15.14528201,
+  ECCENTRICITY: 0.00014535,
+  INCLINATION: 97.2831,
+  RA_OF_ASC_NODE: 81.2346,
+  ARG_OF_PERICENTER: 99.4842,
+  MEAN_ANOMALY: 3.5325,
+  PERIOD: undefined,
+  APOAPSIS: undefined,
+  PERIAPSIS: undefined,
+  BSTAR: 0.23005901,
+  MEAN_MOTION_DOT: 0.04838248,
+  MEAN_MOTION_DDOT: 0,
+};
+
 export const secondValidOmm: NormalizedOmmRecord = {
   ...validOmm,
   OBJECT_NAME: 'HELIOS 2A',
