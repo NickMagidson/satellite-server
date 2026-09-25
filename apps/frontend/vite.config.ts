@@ -18,7 +18,6 @@ const cesiumPath = path.join(repoRoot, 'node_modules/cesium/Build/Cesium')
 const cesiumBaseUrl = 'cesium'
 
 function cesiumAssetsPlugin(): Plugin {
-  let outDir = 'dist'
   let isBuild = false
 
   return {
@@ -30,9 +29,6 @@ function cesiumAssetsPlugin(): Plugin {
           CESIUM_BASE_URL: JSON.stringify(`/${cesiumBaseUrl}/`),
         },
       }
-    },
-    configResolved(resolved) {
-      outDir = path.resolve(resolved.root, resolved.build.outDir)
     },
     configureServer({ middlewares }) {
       middlewares.use(
@@ -47,11 +43,16 @@ function cesiumAssetsPlugin(): Plugin {
       )
     },
     async closeBundle() {
-      if (!isBuild) {
+      // Only the client output is served as static files in production.
+      if (!isBuild || this.environment.name !== 'client') {
         return
       }
 
-      const destination = path.join(outDir, cesiumBaseUrl)
+      const { root, build } = this.environment.config
+      const destination = path.join(
+        path.resolve(root, build.outDir),
+        cesiumBaseUrl,
+      )
       await fs.mkdir(destination, { recursive: true })
 
       for (const directory of ['Assets', 'ThirdParty', 'Workers', 'Widgets']) {
