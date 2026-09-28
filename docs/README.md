@@ -15,6 +15,7 @@ docs/GUARDRAILS.md                   Hard safety rules
 docs/ARCHITECTURE.md                 Repo structure and data flow
 docs/DECISIONS.md                    Intentional design choices
 docs/STYLES.md                       Coding conventions
+docs/BRAND.md                        Lynx brand tokens and UI rules
 docs/WORKFLOW.md                     Task lifecycle
 docs/workflow/WORKFLOW-PRS.md        Pull request guidelines
 ```

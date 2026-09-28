@@ -1,0 +1,1072 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lynx — Brand Kit (Black field)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      /* Black field — comparison clone of the navy preview. */
+      --void: #000000;
+      --object: #f7f7f7;
+      --solar: #56e9fd;
+
+      --void-900: #000000;
+      --void-800: #0a0a0a;
+      --void-700: #141414;
+      --void-600: #1f1f1f;
+      --object-200: #ececec;
+      --solar-700: #0e9eae;
+      --solar-900: #06343a;
+
+      /* Provisional — not in the Figma kit; needed for fault states */
+      --flare: #ff6b4a;
+
+      --line-dark: rgba(247, 247, 247, 0.12);
+      --line-dark-strong: rgba(247, 247, 247, 0.22);
+      --line-light: rgba(7, 16, 25, 0.14);
+      --text-muted-dark: rgba(247, 247, 247, 0.62);
+      --text-faint-dark: rgba(247, 247, 247, 0.4);
+      --text-muted-light: rgba(7, 16, 25, 0.6);
+
+      --font-display: "IBM Sans", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      --tracking-data: 0.1em;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --grid: 24px;
+      --page-pad: clamp(20px, 3.2vw, 44px);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      background: var(--void);
+      color: var(--object);
+      font-family: var(--font-display);
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.45;
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-data);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .band { position: relative; padding: 28px var(--page-pad) 36px; overflow: hidden; }
+    .band--dark { background: var(--void); color: var(--object); }
+    .band--deep { background: var(--void-900); color: var(--object); }
+    .band--light { background: var(--object); color: var(--void); }
+    .band + .band { border-top: 1px solid var(--line-dark); }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .section-title { font-size: 14px; font-weight: 500; margin: 0; }
+    .section-ref { color: var(--solar); }
+    .band--light .section-ref { color: var(--text-muted-light); }
+
+    .doc-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px 20px;
+      flex-wrap: wrap;
+      padding: 10px var(--page-pad);
+      border-bottom: 1px solid var(--line-dark);
+      color: var(--text-faint-dark);
+      background: var(--void-900);
+    }
+    .doc-bar span:first-child { color: var(--object); }
+    .doc-bar a { color: var(--solar); text-decoration: none; }
+    .doc-bar a:hover { text-decoration: underline; }
+
+    .brand-lockup { display: block; width: 100%; max-width: 100%; height: auto; }
+    .brand-mark { display: block; width: 100%; height: auto; object-fit: contain; background: transparent; }
+    .brand-mark--sm { width: 32px; height: 32px; }
+    .brand-mark--md { width: 160px; height: auto; }
+
+    .mark {
+      display: inline-block;
+      flex: none;
+      color: currentColor;
+    }
+    .mark svg { display: block; width: 100%; height: 100%; }
+    .mark--sm { width: 28px; height: 28px; }
+    .mark--md { width: 108px; height: 108px; }
+    .mark--hero { width: min(42vw, 320px); height: min(42vw, 320px); }
+
+    .hero { min-height: 280px; }
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(220px, 280px) 1px minmax(240px, 1fr);
+      gap: 32px;
+      align-items: center;
+      min-height: 180px;
+    }
+    .hero-grid > * { min-width: 0; }
+    .hero-meta p { margin: 10px 0 16px; font-size: 14px; color: var(--text-muted-dark); max-width: 30ch; }
+    .hero-meta .mono { color: var(--text-muted-dark); }
+    .hero-divider { align-self: stretch; background: var(--line-dark); }
+    .hero-logo {
+      width: 100%;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-logo img {
+      display: block;
+      width: min(100%, 420px);
+      height: auto;
+    }
+    .logo-card .brand-lockup {
+      display: block;
+      width: 100%;
+      max-width: min(100%, calc(100vw - 48px));
+      height: auto;
+    }
+    .wordmark {
+      font-size: clamp(56px, 7vw, 92px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin: 0;
+    }
+    .wordmark-rule { width: min(100%, 220px); height: 1px; background: var(--solar); margin-top: 18px; }
+    .hero-art {
+      justify-self: end;
+      color: var(--object);
+    }
+    .hero-caption {
+      position: absolute;
+      right: var(--page-pad);
+      bottom: 28px;
+      color: var(--text-muted-dark);
+    }
+
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border: 1px solid var(--line-dark-strong);
+      border-radius: 999px;
+      color: var(--object);
+      background: transparent;
+    }
+    .band--light .chip { border-color: var(--line-light); color: var(--void); }
+
+    .identity-grid {
+      display: grid;
+      grid-template-columns: 1fr 0.7fr 1.25fr;
+      gap: 0;
+    }
+    .identity-grid > section { padding: 0 20px; min-width: 0; }
+    .identity-grid > section:first-child { padding-left: 0; }
+    .identity-grid > section:last-child { padding-right: 0; }
+    .identity-grid > section + section { border-left: 1px solid var(--line-light); }
+
+    .logo-card {
+      position: relative;
+      border-radius: var(--radius-md);
+      min-height: 190px;
+      min-width: 0;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .logo-card--dark { background: var(--void-800); color: var(--object); }
+    .logo-card--light {
+      background: var(--object-200);
+      color: var(--void);
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    .lockup { display: flex; align-items: center; gap: 12px; }
+    .lockup-name { font-size: 22px; font-weight: 500; letter-spacing: -0.02em; line-height: 1; }
+    .lockup-sub { color: var(--text-muted-dark); margin-top: 4px; font-size: 8px; }
+    .logo-card-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--text-muted-dark);
+    }
+    .logo-card-foot p { margin: 0; max-width: 34ch; }
+
+    .swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .swatch {
+      appearance: none;
+      border: 0;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      min-height: 190px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 160ms ease;
+    }
+    .swatch:hover { transform: translateY(-2px); }
+    .swatch:focus-visible { outline: 2px solid var(--solar-700); outline-offset: 2px; }
+    .swatch .mono { font-size: 9px; }
+    .swatch .swatch-hex { opacity: 0.8; }
+    .swatch--void { background: var(--void); color: var(--object); }
+    .swatch--object { background: var(--object); color: var(--void); box-shadow: inset 0 0 0 1px var(--line-light); }
+    .swatch--solar { background: var(--solar); color: var(--void); }
+
+    .ratio { margin-top: 14px; }
+    .ratio-bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line-light); }
+    .ratio-bar span { display: block; }
+    .ratio-legend { display: flex; justify-content: space-between; margin-top: 6px; color: var(--text-muted-light); }
+
+    .type-grid { display: grid; grid-template-columns: 1fr 1px 1.5fr; gap: 28px; }
+    .type-grid > .rule { background: var(--line-dark); }
+    .specimen { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 20px; padding: 18px 0; }
+    .specimen + .specimen { border-top: 1px solid var(--line-dark); }
+    .specimen-glyph { font-size: 60px; line-height: 1; font-weight: 500; }
+    .specimen-glyph--mono { font-family: var(--font-mono); font-weight: 400; letter-spacing: 0; }
+    .specimen-name { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+    .specimen-name--mono { font-family: var(--font-mono); font-weight: 500; }
+    .specimen .mono { color: var(--text-faint-dark); }
+    .specimen-weights { font-size: 13px; color: var(--text-muted-dark); margin-top: 6px; }
+
+    .guideline { display: grid; grid-template-columns: 1fr 190px; gap: 28px; }
+    .guideline .eyebrow { color: var(--solar); }
+    .guideline h3 { font-size: clamp(30px, 3.4vw, 42px); font-weight: 500; line-height: 1.08; margin: 10px 0 8px; letter-spacing: -0.005em; }
+    .guideline h4 { font-size: 18px; font-weight: 500; margin: 0 0 8px; }
+    .guideline p { font-size: 14px; color: var(--text-muted-dark); max-width: 60ch; margin: 0; }
+    .rules-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+    .rules-list li { font-size: 12px; color: var(--text-muted-dark); }
+    .rules-list .mono { color: var(--object); display: block; margin-bottom: 2px; }
+
+    .scale { margin-top: 26px; border-top: 1px solid var(--line-dark); }
+    .scale-row { display: grid; grid-template-columns: 150px 1fr 170px; align-items: baseline; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--line-dark); }
+    .scale-row .mono { color: var(--text-faint-dark); }
+    .scale-row .spec { text-align: right; }
+    .scale-sample { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .tile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .tile {
+      position: relative;
+      border-radius: var(--radius-md);
+      min-height: 230px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .tile svg.fill, .tile .fill { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .tile-caption { position: absolute; left: 14px; bottom: 12px; z-index: 2; }
+    .tile-caption .mono { font-size: 9px; }
+    .tile-caption p { margin: 2px 0 0; font-size: 11px; }
+    .tile--trajectory { background: var(--void-800); color: var(--object); }
+    .tile--trajectory .tile-caption .mono { color: var(--text-faint-dark); }
+    .tile--trajectory .tile-caption p { color: var(--solar); }
+    .tile--horizon { background: radial-gradient(120% 90% at 20% 10%, #1a1a1a 0%, #000000 70%); color: var(--object); }
+    .tile--horizon .tile-caption .mono { color: var(--text-faint-dark); }
+    .tile--horizon .tile-caption p { color: var(--text-muted-dark); }
+    .tile--telemetry {
+      background-color: var(--solar);
+      background-image:
+        linear-gradient(to right, rgba(7, 16, 25, 0.07) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(7, 16, 25, 0.07) 1px, transparent 1px);
+      background-size: var(--grid) var(--grid);
+      color: var(--void);
+    }
+    .tile--telemetry .tile-caption .mono { color: rgba(7, 16, 25, 0.6); }
+
+    .planet {
+      position: absolute;
+      width: 150%;
+      aspect-ratio: 1;
+      left: 38%;
+      top: 44%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #1c1c1c 0%, #050505 60%);
+      box-shadow:
+        inset 10px 8px 22px -6px rgba(86, 233, 253, 0.85),
+        -6px -4px 40px -6px rgba(86, 233, 253, 0.45),
+        -20px -14px 90px -10px rgba(86, 233, 253, 0.2);
+    }
+    .moon {
+      position: absolute;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      left: 22%; top: 24%;
+      background: radial-gradient(circle at 35% 35%, #6b7a80, #1b262c);
+    }
+
+    .telemetry-big { position: absolute; left: 16px; top: 14px; font-size: 34px; font-weight: 500; letter-spacing: -0.01em; }
+    .telemetry-id { position: absolute; right: 22%; top: 46%; font-family: var(--font-mono); font-size: 22px; font-weight: 500; }
+    .telemetry-dot { position: absolute; width: 3px; height: 3px; background: var(--void); border-radius: 50%; }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr 1.35fr;
+      grid-template-rows: auto auto;
+      gap: 12px;
+    }
+    .app-ops { grid-column: 1; grid-row: 1; }
+    .app-badge { grid-column: 2; grid-row: 1; }
+    .app-poster { grid-column: 3; grid-row: 1 / span 2; }
+    .app-banner { grid-column: 1 / span 2; grid-row: 2; }
+
+    .card { border-radius: var(--radius-md); position: relative; overflow: hidden; }
+
+    .ops { background: var(--void-800); border: 1px solid var(--line-dark); padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .ops-head { display: flex; justify-content: space-between; align-items: center; }
+    .ops-title { display: flex; align-items: center; gap: 10px; color: var(--object); }
+    .live { display: inline-flex; align-items: center; gap: 6px; color: var(--solar); }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--solar); box-shadow: 0 0 0 0 rgba(86, 233, 253, 0.6); animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(86, 233, 253, 0.55); }
+      70% { box-shadow: 0 0 0 7px rgba(86, 233, 253, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(86, 233, 253, 0); }
+    }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat { background: var(--void-700); border: 1px solid var(--line-dark); border-radius: var(--radius-sm); padding: 10px 12px; }
+    .stat .mono { color: var(--text-faint-dark); font-size: 9px; }
+    .stat-value { font-family: var(--font-mono); font-size: 17px; font-weight: 500; margin: 8px 0 2px; font-variant-numeric: tabular-nums; }
+    .stat-delta { color: var(--solar); font-size: 9px; }
+    .track { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; color: var(--text-faint-dark); }
+    .track-line { position: relative; height: 1px; background: var(--line-dark-strong); }
+    .track-fill { position: absolute; inset: 0 auto 0 0; background: var(--solar); width: 0%; }
+    .track-knob { position: absolute; top: 50%; width: 9px; height: 9px; border-radius: 50%; background: var(--solar); transform: translate(-50%, -50%); box-shadow: 0 0 10px rgba(86, 233, 253, 0.7); }
+
+    .badge { background: var(--void); color: var(--object); border: 1px solid var(--line-dark); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px; }
+    .badge-head { display: flex; justify-content: space-between; align-items: flex-start; }
+    .badge-name { font-size: 22px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+    .badge-role { margin-top: 4px; font-size: 9px; }
+    .badge-foot { display: flex; justify-content: space-between; align-items: flex-end; }
+    .badge-foot .mono { font-size: 9px; }
+
+    .poster {
+      min-height: 440px;
+      background: radial-gradient(140% 90% at 50% 0%, #141414 0%, #000000 70%);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .poster-head { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; color: var(--object); }
+    .poster-horizon {
+      position: absolute;
+      left: -40%;
+      right: -40%;
+      bottom: -118%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 30%, #161616 0%, #000000 60%);
+      box-shadow:
+        0 -2px 10px rgba(86, 233, 253, 0.9),
+        0 -14px 60px rgba(86, 233, 253, 0.35),
+        0 -40px 140px rgba(86, 233, 253, 0.18);
+    }
+    .poster-copy { position: relative; z-index: 2; }
+    .poster-copy h3 {
+      margin: 0 0 12px;
+      font-size: clamp(30px, 3vw, 40px);
+      line-height: 1.02;
+      font-weight: 500;
+      color: rgba(247, 247, 247, 0.55);
+      letter-spacing: -0.01em;
+    }
+    .poster-foot { display: flex; justify-content: space-between; align-items: center; color: var(--text-faint-dark); }
+    .round-cta {
+      width: 30px; height: 30px; border-radius: 50%;
+      display: grid; place-items: center;
+      background: rgba(86, 233, 253, 0.18);
+      border: 1px solid rgba(86, 233, 253, 0.55);
+      color: var(--solar);
+      cursor: pointer;
+    }
+
+    .banner { min-height: 220px; background: var(--void); }
+    .banner svg.fill { position: absolute; top: 0; right: 0; bottom: 0; width: 68%; height: 100%; }
+    .banner-rule { position: absolute; left: 34%; right: 0; top: 70%; height: 2px; background: var(--solar); box-shadow: 0 0 18px rgba(86, 233, 253, 0.6); z-index: 2; }
+    .banner-lockup { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); z-index: 3; width: min(280px, 30%); }
+    .banner-lockup img { display: block; width: 100%; height: auto; }
+    .banner-lockup .lockup-name { font-size: 34px; text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6); }
+    .banner-lockup .mono { color: var(--text-muted-dark); margin-top: 6px; }
+    .banner-ref { position: absolute; right: 16px; bottom: 12px; z-index: 3; color: var(--text-muted-dark); }
+
+    .ui-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .ui-panel { background: #fff9; border: 1px solid var(--line-light); border-radius: var(--radius-md); padding: 16px; }
+    .ui-panel--dark { background: var(--void); color: var(--object); border-color: var(--void); }
+    .ui-panel h3 { font-size: 13px; font-weight: 500; margin: 0 0 14px; }
+    .ui-panel .mono.label { color: var(--text-muted-light); margin-bottom: 8px; }
+    .ui-panel--dark .mono.label { color: var(--text-faint-dark); }
+    .stack { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .stack + .stack, .stack + .mono.label { margin-top: 14px; }
+
+    .btn {
+      appearance: none;
+      font: 500 13px/1 var(--font-display);
+      padding: 11px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+    }
+    .btn:focus-visible { outline: 2px solid var(--solar); outline-offset: 2px; }
+    .btn--primary { background: var(--object); color: var(--void); }
+    .btn--primary:hover { background: #ffffff; }
+    .btn--secondary { background: transparent; color: var(--object); border-color: var(--solar); }
+    .btn--secondary:hover { background: rgba(86, 233, 253, 0.1); }
+    .btn--ghost { background: transparent; color: var(--text-muted-dark); border-color: var(--line-dark-strong); }
+    .btn--ghost:hover { color: var(--object); border-color: var(--object); }
+    .btn--ink { background: var(--void); color: var(--object); }
+    .btn--ink:hover { background: var(--void-600); }
+
+    .status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--line-light); }
+    .status i { width: 6px; height: 6px; border-radius: 50%; display: block; }
+    .status--live i { background: var(--solar); }
+    .status--nominal i { background: var(--solar-700); }
+    .status--hold i { background: transparent; border: 1px solid var(--void); }
+    .status--fault i { background: var(--flare); }
+
+    .field { display: grid; gap: 6px; }
+    .field label { color: var(--text-muted-light); }
+    .field input {
+      font: 400 13px var(--font-mono);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line-light);
+      background: var(--object);
+      color: var(--void);
+    }
+    .field input:focus { outline: none; border-color: var(--void); box-shadow: 0 0 0 3px rgba(86, 233, 253, 0.5); }
+    .field small { color: var(--text-muted-light); font-size: 11px; }
+
+    .readout { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .readout th { text-align: left; font-weight: 400; color: var(--text-faint-dark); font-size: 9px; letter-spacing: var(--tracking-data); text-transform: uppercase; padding: 0 0 8px; border-bottom: 1px solid var(--line-dark); }
+    .readout td { padding: 8px 0; border-bottom: 1px solid var(--line-dark); }
+    .readout td:last-child, .readout th:last-child { text-align: right; }
+    .readout .ok { color: var(--solar); }
+    .readout .warn { color: var(--flare); }
+
+    .tokens { position: relative; margin-top: 12px; }
+    .tokens pre {
+      margin: 0;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: var(--void);
+      color: var(--object);
+      font: 12px/1.6 var(--font-mono);
+      overflow-x: auto;
+    }
+    .tokens pre .c { color: var(--text-faint-dark); }
+    .tokens pre .k { color: var(--solar); }
+    .tokens pre .v { color: var(--object); }
+    .tokens .btn { position: absolute; top: 10px; right: 10px; padding: 7px 10px; font-size: 11px; }
+
+    .footer { display: flex; justify-content: space-between; color: var(--text-faint-dark); padding: 16px var(--page-pad); border-top: 1px solid var(--line-dark); background: var(--void-900); }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 24px;
+      transform: translate(-50%, 20px);
+      background: var(--void); color: var(--object);
+      border: 1px solid var(--solar);
+      padding: 8px 14px; border-radius: 999px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+      z-index: 50;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 1080px) {
+      .hero-grid { grid-template-columns: 1fr 1px 1fr; }
+      .hero-caption { display: none; }
+      .identity-grid { grid-template-columns: 1fr 1fr; row-gap: 28px; }
+      .identity-grid > section:nth-child(3) { grid-column: 1 / -1; border-left: 0; padding-left: 0; }
+      .type-grid { grid-template-columns: 1fr; }
+      .type-grid > .rule { display: none; }
+      .app-grid { grid-template-columns: 1fr 1fr; }
+      .app-ops { grid-column: 1 / -1; grid-row: auto; }
+      .app-badge { grid-column: 1; grid-row: auto; }
+      .app-poster { grid-column: 2; grid-row: auto; min-height: 320px; }
+      .app-banner { grid-column: 1 / -1; grid-row: auto; }
+      .ui-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 720px) {
+      .hero-grid { display: flex; flex-direction: column; align-items: stretch; gap: 28px; }
+      .hero-divider { display: none; }
+      .identity-grid { grid-template-columns: minmax(0, 1fr); }
+      .identity-grid > section { padding: 0 !important; border-left: 0 !important; }
+      .swatches { grid-template-columns: repeat(2, 1fr); }
+      .swatch { min-height: 120px; }
+      .guideline { grid-template-columns: 1fr; }
+      .scale-row { grid-template-columns: 1fr; gap: 4px; }
+      .scale-row .spec { text-align: left; }
+      .tile-grid, .app-grid, .ui-grid { grid-template-columns: 1fr; }
+      .app-badge, .app-poster { grid-column: 1; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .banner { min-height: 300px; }
+      .banner-lockup { position: relative; left: auto; top: auto; transform: none; width: min(260px, 78%); margin: 16px 16px 0; }
+      .banner svg.fill { top: auto; bottom: 0; width: 100%; height: 150px; }
+      .banner-rule { left: 0; top: auto; bottom: 46px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="doc-bar mono">
+    <span>Lynx — Brand System</span>
+    <span>Black #000000 · <a href="./index.html">Navy #0B1E36</a></span>
+  </div>
+
+  <header class="band band--dark hero" aria-labelledby="main-logo-title">
+    <div class="section-head">
+      <h2 class="section-title" id="main-logo-title">Main Logo</h2>
+      <span class="mono section-ref">01 / Lynx</span>
+    </div>
+
+    <div class="hero-grid">
+      <div class="hero-meta">
+        <div class="mono">Orbital Infrastructure</div>
+        <p>Precision systems for the distance between worlds. Engineered on Earth, proven beyond it.</p>
+        <div class="chip-row">
+          <span class="chip mono">Precise</span>
+          <span class="chip mono">Boundless</span>
+        </div>
+      </div>
+      <div class="hero-divider" aria-hidden="true"></div>
+      <h1 class="hero-logo">
+        <img src="./lynx-logo-clear.png" width="1024" height="434" alt="Lynx" />
+      </h1>
+    </div>
+    <div class="hero-caption mono">Primary lockup · Black field · Wordmark in IBM Sans</div>
+  </header>
+
+  <section class="band band--light" aria-label="Identity and color">
+    <div class="identity-grid">
+      <section aria-labelledby="alt-logo-title">
+        <div class="section-head">
+          <h2 class="section-title" id="alt-logo-title">Lockup</h2>
+          <span class="mono section-ref">02</span>
+        </div>
+        <div class="logo-card logo-card--dark">
+          <img class="brand-lockup" src="./lynx-logo-clear.png" width="1024" height="434" alt="Lynx horizontal lockup" />
+          <div class="logo-card-foot">
+            <p>Horizontal lockup for interfaces, vehicles, and mission hardware. Supplied on black.</p>
+            <span class="mono">Primary</span>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="sub-mark-title">
+        <div class="section-head">
+          <h2 class="section-title" id="sub-mark-title">Sub Mark</h2>
+          <span class="mono section-ref">03</span>
+        </div>
+        <div class="logo-card logo-card--dark" style="align-items: center; justify-content: center; gap: 16px;">
+          <img class="brand-mark brand-mark--md" src="./lynx-mark-clear.png" width="452" height="434" alt="" />
+          <span class="mono">Mark only · black field</span>
+        </div>
+      </section>
+
+      <section aria-labelledby="palette-title">
+        <div class="section-head">
+          <h2 class="section-title" id="palette-title">Color Palette</h2>
+          <span class="mono section-ref">04</span>
+        </div>
+        <div class="swatches">
+          <button class="swatch swatch--void" data-copy="#000000" type="button">
+            <span class="mono">Field</span>
+            <span>
+              <span class="mono" style="display:block;opacity:.6">Black / Surfaces</span>
+              <span class="mono swatch-hex">#000000</span>
+            </span>
+          </button>
+          <button class="swatch swatch--object" data-copy="#F7F7F7" type="button">
+            <span class="mono">Mark</span>
+            <span>
+              <span class="mono" style="display:block;opacity:.6">White / Wordmark</span>
+              <span class="mono swatch-hex">#F7F7F7</span>
+            </span>
+          </button>
+          <button class="swatch swatch--solar" data-copy="#56E9FD" type="button">
+            <span class="mono">Orbit</span>
+            <span>
+              <span class="mono" style="display:block;opacity:.6">Cyan / Signal</span>
+              <span class="mono swatch-hex">#56E9FD</span>
+            </span>
+          </button>
+        </div>
+        <div class="ratio" aria-label="Suggested color usage ratio">
+          <div class="ratio-bar">
+            <span style="flex: 78; background: var(--void)"></span>
+            <span style="flex: 16; background: var(--object)"></span>
+            <span style="flex: 6; background: var(--solar)"></span>
+          </div>
+          <div class="ratio-legend mono">
+            <span>Field 78</span><span>Mark 16</span><span>Orbit 6</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class="band band--dark" aria-label="Typography">
+    <div class="type-grid">
+      <div>
+        <div class="section-head">
+          <h2 class="section-title">Typography</h2>
+          <span class="mono section-ref">05 / Lynx</span>
+        </div>
+        <div class="specimen">
+          <div class="specimen-glyph" aria-hidden="true">Aa</div>
+          <div>
+            <p class="specimen-name">IBM Sans</p>
+            <div class="mono">Wordmark / Display / Interface</div>
+            <div class="specimen-weights">IBM Plex Sans · Regular 400 · Medium 500 · SemiBold 600</div>
+          </div>
+        </div>
+        <div class="specimen">
+          <div class="specimen-glyph specimen-glyph--mono" aria-hidden="true">01</div>
+          <div>
+            <p class="specimen-name specimen-name--mono">IBM Plex Mono</p>
+            <div class="mono">Telemetry / Data / Captions</div>
+            <div class="specimen-weights">Regular 400 · Medium 500</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <div>
+        <div class="section-head">
+          <h2 class="section-title">Typography Guideline</h2>
+          <span class="mono section-ref">06 / Lynx</span>
+        </div>
+        <div class="guideline">
+          <div>
+            <div class="mono eyebrow">Mission Profile</div>
+            <h3>Beyond the near<br />horizon.</h3>
+            <h4>Orbital systems, made legible.</h4>
+            <p>The wordmark is “Lynx” in IBM Sans, title case, at the face’s own spacing. Keep body copy calm and compact.</p>
+          </div>
+          <ul class="rules-list">
+            <li><span class="mono">01 / Headline Case</span>Headlines stay quiet, direct and declarative. Sentence case, end with a period.</li>
+            <li><span class="mono">02 / Data Tracking</span>Metadata uses +100 tracking in mono uppercase.</li>
+            <li><span class="mono">03 / Max 60 Chars</span>Maintain narrow measures for technical clarity.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="scale" aria-label="Type scale">
+      <div class="scale-row">
+        <span class="mono">Display / 01</span>
+        <span class="scale-sample" style="font-size: 56px; font-weight: 500; line-height: 1; letter-spacing: -0.02em">Lynx</span>
+        <span class="mono spec">IBM Sans 500 · 56–92 / 1.0</span>
+      </div>
+      <div class="scale-row">
+        <span class="mono">Headline / H1</span>
+        <span class="scale-sample" style="font-size: 40px; font-weight: 500; line-height: 1.08">Beyond the near horizon.</span>
+        <span class="mono spec">IBM Sans 500 · 40 / 1.08</span>
+      </div>
+      <div class="scale-row">
+        <span class="mono">Headline / H2</span>
+        <span class="scale-sample" style="font-size: 24px; font-weight: 500">Orbital systems, made legible.</span>
+        <span class="mono spec">IBM Sans 500 · 24 / 1.2</span>
+      </div>
+      <div class="scale-row">
+        <span class="mono">Title / H3</span>
+        <span class="scale-sample" style="font-size: 18px; font-weight: 600">Mission operations</span>
+        <span class="mono spec">IBM Sans 600 · 18 / 1.3</span>
+      </div>
+      <div class="scale-row">
+        <span class="mono">Body</span>
+        <span class="scale-sample" style="font-size: 14px; color: var(--text-muted-dark)">Precision systems for the distance between worlds. Engineered on Earth, proven beyond it.</span>
+        <span class="mono spec">IBM Sans 400 · 14 / 1.45</span>
+      </div>
+      <div class="scale-row">
+        <span class="mono">Readout</span>
+        <span class="scale-sample" style="font-family: var(--font-mono); font-size: 17px; font-weight: 500">408.2 KM · 7.66 KM/S · 92:41</span>
+        <span class="mono spec">Plex Mono 500 · 17 · tabular</span>
+      </div>
+      <div class="scale-row">
+        <span class="mono">Label</span>
+        <span class="scale-sample mono" style="color: var(--object)">Lynx / Primary Lockup</span>
+        <span class="mono spec">Plex Mono 400 · 10 · +100 · Caps</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--light" aria-labelledby="patterns-title">
+    <div class="section-head">
+      <h2 class="section-title" id="patterns-title">Patterns &amp; Illustrations</h2>
+      <span class="mono section-ref">07 / Lynx</span>
+    </div>
+    <div class="tile-grid">
+      <figure class="tile tile--trajectory" style="margin:0">
+        <svg class="fill" viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <pattern id="grid-dark" width="24" height="24" patternUnits="userSpaceOnUse">
+              <path d="M24 0H0V24" fill="none" stroke="rgba(247,247,247,0.04)" />
+            </pattern>
+          </defs>
+          <rect width="400" height="240" fill="url(#grid-dark)" />
+          <circle cx="140" cy="60" r="110" fill="none" stroke="rgba(86,233,253,0.35)" />
+          <circle cx="250" cy="150" r="115" fill="none" stroke="rgba(86,233,253,0.35)" />
+          <circle cx="250" cy="150" r="70" fill="none" stroke="rgba(247,247,247,0.08)" stroke-dasharray="2 5" />
+          <line x1="30" y1="240" x2="150" y2="-10" stroke="#56e9fd" stroke-width="1.2" />
+          <circle cx="210" cy="92" r="5" fill="#56e9fd" />
+        </svg>
+        <figcaption class="tile-caption">
+          <div class="mono">Pattern 01 / Trajectory</div>
+          <p>Reference 24° / 220 km</p>
+        </figcaption>
+      </figure>
+
+      <figure class="tile tile--horizon" style="margin:0">
+        <svg class="fill" data-stars="90" aria-hidden="true"></svg>
+        <div class="moon" aria-hidden="true"></div>
+        <div class="planet" aria-hidden="true"></div>
+        <figcaption class="tile-caption">
+          <div class="mono">Illustration 01 / Horizon</div>
+          <p>Atmospheric light / cropped field</p>
+        </figcaption>
+      </figure>
+
+      <figure class="tile tile--telemetry" style="margin:0">
+        <div class="telemetry-big">+27.8°</div>
+        <div class="telemetry-id">AV-2048</div>
+        <span class="telemetry-dot" style="left: 26%; top: 34%"></span>
+        <span class="telemetry-dot" style="left: 44%; top: 58%"></span>
+        <span class="telemetry-dot" style="left: 72%; top: 30%"></span>
+        <span class="telemetry-dot" style="left: 78%; top: 78%"></span>
+        <span class="telemetry-dot" style="left: 60%; top: 86%"></span>
+        <figcaption class="tile-caption">
+          <div class="mono">Pattern 02 / Telemetry</div>
+          <p>Grid 24 px / data-led crop</p>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="band band--dark" aria-labelledby="apps-title">
+    <div class="section-head">
+      <h2 class="section-title" id="apps-title">Applications / Mockups</h2>
+      <span class="mono section-ref">08 / Lynx</span>
+    </div>
+
+    <div class="app-grid">
+      <article class="card ops app-ops" aria-label="Mission ops dashboard">
+        <div class="ops-head">
+          <div class="ops-title">
+            <img class="brand-mark brand-mark--sm" src="./lynx-mark-clear.png" width="452" height="434" alt="" />
+            <span class="mono">Lynx / Mission Ops</span>
+          </div>
+          <span class="live mono"><span class="live-dot" aria-hidden="true"></span>Live</span>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <div class="mono">Altitude</div>
+            <div class="stat-value" id="alt">408.2 KM</div>
+            <div class="mono stat-delta" id="alt-delta">+0.4</div>
+          </div>
+          <div class="stat">
+            <div class="mono">Velocity</div>
+            <div class="stat-value" id="vel">7.66 KM/S</div>
+            <div class="mono stat-delta">Nominal</div>
+          </div>
+          <div class="stat">
+            <div class="mono">Orbit</div>
+            <div class="stat-value">92:41</div>
+            <div class="mono stat-delta" id="los">T-12:40</div>
+          </div>
+        </div>
+        <div class="track mono">
+          <span>AOS 0N</span>
+          <div class="track-line" aria-hidden="true">
+            <div class="track-fill" id="track-fill"></div>
+            <div class="track-knob" id="track-knob"></div>
+          </div>
+          <span>LOS 0Y</span>
+        </div>
+      </article>
+
+      <article class="card badge app-badge" aria-label="Crew credential">
+        <div class="badge-head">
+          <img class="brand-mark brand-mark--sm" src="./lynx-mark-clear.png" width="452" height="434" alt="" />
+          <span class="mono">Crew / 002</span>
+        </div>
+        <div>
+          <p class="badge-name">Dr. Imani Vale</p>
+          <div class="mono badge-role">Flight Systems / Lunar Transit</div>
+        </div>
+        <div class="badge-foot">
+          <div class="mono">AV-LT<br />Valid 2048-09</div>
+          <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+            <path d="M1 8V1h7M22 1h7v7M29 22v7h-7M8 29H1v-7" fill="none" stroke="#f7f7f7" stroke-width="1.5" />
+            <rect x="8" y="8" width="5" height="5" fill="#f7f7f7" />
+            <rect x="17" y="8" width="5" height="5" fill="#f7f7f7" />
+            <rect x="8" y="17" width="5" height="5" fill="#f7f7f7" />
+            <rect x="15" y="15" width="3" height="3" fill="#f7f7f7" />
+            <rect x="19" y="19" width="3" height="3" fill="#f7f7f7" />
+          </svg>
+        </div>
+      </article>
+
+      <article class="card poster app-poster" aria-label="Campaign poster">
+        <svg class="fill" data-stars="220" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"></svg>
+        <div class="poster-horizon" aria-hidden="true"></div>
+        <div class="poster-head">
+          <img class="brand-mark brand-mark--sm" src="./lynx-mark-clear.png" width="452" height="434" alt="" />
+          <span class="mono">Beyond the Near Horizon</span>
+        </div>
+        <div class="poster-copy">
+          <h3>Distance is a system<br />to solve.</h3>
+          <div class="poster-foot">
+            <span class="mono">Discovery / Lynx</span>
+            <button class="round-cta" type="button" aria-label="Open">
+              <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9 9 3M4 3h5v5" fill="none" stroke="currentColor" stroke-width="1.4" /></svg>
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card banner app-banner" aria-label="Vehicle banner">
+        <svg class="fill" viewBox="0 0 800 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#5d6a70" />
+              <stop offset="0.35" stop-color="#2b363c" />
+              <stop offset="0.7" stop-color="#151d22" />
+              <stop offset="1" stop-color="#0a1014" />
+            </linearGradient>
+            <linearGradient id="hull-sheen" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="rgba(247,247,247,0)" />
+              <stop offset="0.55" stop-color="rgba(247,247,247,0.14)" />
+              <stop offset="1" stop-color="rgba(247,247,247,0)" />
+            </linearGradient>
+            <pattern id="panels" width="46" height="22" patternUnits="userSpaceOnUse" patternTransform="skewX(-18)">
+              <rect width="46" height="22" fill="none" stroke="rgba(0,0,0,0.45)" stroke-width="1" />
+              <circle cx="5" cy="5" r="1" fill="rgba(247,247,247,0.18)" />
+            </pattern>
+          </defs>
+          <g data-stars-group></g>
+          <path d="M120 40 L800 12 L800 196 L120 176 Q86 108 120 40 Z" fill="url(#hull)" />
+          <path d="M120 40 L800 12 L800 196 L120 176 Q86 108 120 40 Z" fill="url(#panels)" />
+          <path d="M120 40 L800 12 L800 70 L110 84 Z" fill="url(#hull-sheen)" />
+          <g stroke="rgba(0,0,0,0.55)" stroke-width="2">
+            <line x1="260" y1="34" x2="260" y2="181" />
+            <line x1="420" y1="27" x2="420" y2="186" />
+            <line x1="590" y1="20" x2="590" y2="191" />
+          </g>
+          <g fill="#0a1014" stroke="rgba(247,247,247,0.12)">
+            <rect x="300" y="58" width="80" height="22" rx="2" />
+            <rect x="460" y="52" width="100" height="18" rx="2" />
+            <rect x="630" y="44" width="120" height="16" rx="2" />
+          </g>
+        </svg>
+        <div class="banner-rule" aria-hidden="true"></div>
+        <div class="banner-lockup">
+          <div class="lockup">
+            <img src="./lynx-logo-clear.png" width="1024" height="434" alt="Lynx" />
+          </div>
+        </div>
+        <span class="banner-ref mono">Ref / AV-2048</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="band band--light" aria-labelledby="ui-title">
+    <div class="section-head">
+      <h2 class="section-title" id="ui-title">Interface Primitives</h2>
+      <span class="mono section-ref">09 / Extended — proposed</span>
+    </div>
+
+    <div class="ui-grid">
+      <div class="ui-panel ui-panel--dark">
+        <h3>Actions on Void</h3>
+        <div class="mono label">Buttons</div>
+        <div class="stack">
+          <button class="btn btn--primary" type="button">Launch window</button>
+          <button class="btn btn--secondary" type="button">Track object</button>
+          <button class="btn btn--ghost" type="button">Cancel</button>
+        </div>
+        <div class="mono label" style="margin-top:18px">Chips / Filters</div>
+        <div class="stack">
+          <span class="chip mono">LEO</span>
+          <span class="chip mono">MEO</span>
+          <span class="chip mono" style="border-color: var(--solar); color: var(--solar)">GEO · Active</span>
+          <span class="chip mono" style="background: var(--object); color: var(--void); border-color: var(--object)">Selected</span>
+        </div>
+      </div>
+
+      <div class="ui-panel">
+        <h3>Status + Input on Object</h3>
+        <div class="mono label">Status (never color alone)</div>
+        <div class="stack">
+          <span class="status status--live mono"><i></i>Live</span>
+          <span class="status status--nominal mono"><i></i>Nominal</span>
+          <span class="status status--hold mono"><i></i>Hold</span>
+          <span class="status status--fault mono"><i></i>Fault</span>
+        </div>
+        <div class="field" style="margin-top:18px">
+          <label class="mono" for="norad">NORAD Cat ID</label>
+          <input id="norad" value="25544" inputmode="numeric" />
+          <small>Five-digit catalog identifier.</small>
+        </div>
+        <div class="stack" style="margin-top:14px">
+          <button class="btn btn--ink" type="button">Propagate</button>
+        </div>
+      </div>
+
+      <div class="ui-panel ui-panel--dark">
+        <h3>Data Readout</h3>
+        <table class="readout">
+          <thead>
+            <tr><th>Object</th><th>Alt km</th><th>State</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>ISS (ZARYA)</td><td>408.2</td><td class="ok">NOMINAL</td></tr>
+            <tr><td>AV-2048</td><td>551.7</td><td class="ok">NOMINAL</td></tr>
+            <tr><td>STARLINK-3321</td><td>546.0</td><td class="warn">DECAY</td></tr>
+            <tr><td>NOAA 19</td><td>870.4</td><td class="ok">NOMINAL</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tokens">
+      <button class="btn btn--primary" type="button" id="copy-tokens">Copy tokens</button>
+<pre id="tokens-pre"><span class="c">/* Lynx — design tokens sampled from the logo lockup */</span>
+:root {
+  <span class="k">--void</span>: <span class="v">#000000</span>;        <span class="c">/* field, surfaces */</span>
+  <span class="k">--object</span>: <span class="v">#F7F7F7</span>;      <span class="c">/* mark, wordmark, text on black */</span>
+  <span class="k">--solar</span>: <span class="v">#56E9FD</span>;       <span class="c">/* orbit cyan, signal, focus */</span>
+  <span class="k">--flare</span>: <span class="v">#FF6B4A</span>;       <span class="c">/* fault only */</span>
+
+  <span class="k">--font-display</span>: <span class="v">"IBM Plex Sans"</span>, system-ui, sans-serif; <span class="c">/* IBM Sans */</span>
+  <span class="k">--font-mono</span>: <span class="v">"IBM Plex Mono"</span>, ui-monospace, monospace;
+  <span class="k">--tracking-data</span>: <span class="v">0.1em</span>;     <span class="c">/* +100, mono caps only */</span>
+
+  <span class="k">--radius-sm</span>: <span class="v">6px</span>;
+  <span class="k">--radius-md</span>: <span class="v">10px</span>;
+  <span class="k">--grid</span>: <span class="v">24px</span>;
+}</pre>
+    </div>
+  </section>
+
+  <footer class="footer mono">
+    <span>Lynx · Brand system</span>
+    <span>Lockup on black · Wordmark set in IBM Sans</span>
+  </footer>
+
+  <div class="toast mono" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      function seeded(seed) {
+        return function () {
+          seed = (seed * 16807) % 2147483647;
+          return (seed - 1) / 2147483646;
+        };
+      }
+
+      function makeStars(count, rand, w, h) {
+        var ns = "http://www.w3.org/2000/svg";
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < count; i++) {
+          var c = document.createElementNS(ns, "circle");
+          var big = rand() > 0.94;
+          c.setAttribute("cx", (rand() * w).toFixed(1));
+          c.setAttribute("cy", (rand() * h).toFixed(1));
+          c.setAttribute("r", big ? (0.9 + rand() * 0.6).toFixed(2) : (0.3 + rand() * 0.5).toFixed(2));
+          c.setAttribute("fill", "rgba(247,247,247," + (0.25 + rand() * 0.6).toFixed(2) + ")");
+          frag.appendChild(c);
+        }
+        return frag;
+      }
+
+      document.querySelectorAll("svg[data-stars]").forEach(function (svg, i) {
+        svg.setAttribute("viewBox", "0 0 400 400");
+        svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
+        svg.appendChild(makeStars(+svg.dataset.stars, seeded(1337 + i * 97), 400, 400));
+      });
+      document.querySelectorAll("g[data-stars-group]").forEach(function (g) {
+        g.appendChild(makeStars(140, seeded(4242), 800, 220));
+      });
+
+      var toast = document.getElementById("toast");
+      var toastTimer;
+      function notify(msg) {
+        toast.textContent = msg;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 1400);
+      }
+      function copy(text, label) {
+        if (!navigator.clipboard) return notify("Clipboard unavailable");
+        navigator.clipboard.writeText(text).then(function () { notify("Copied " + label); });
+      }
+      document.querySelectorAll("[data-copy]").forEach(function (el) {
+        el.addEventListener("click", function () { copy(el.dataset.copy, el.dataset.copy); });
+      });
+      document.getElementById("copy-tokens").addEventListener("click", function () {
+        copy(document.getElementById("tokens-pre").innerText, "tokens");
+      });
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      var alt = document.getElementById("alt");
+      var altDelta = document.getElementById("alt-delta");
+      var vel = document.getElementById("vel");
+      var los = document.getElementById("los");
+      var fill = document.getElementById("track-fill");
+      var knob = document.getElementById("track-knob");
+      var baseAlt = 408.2;
+      var losSeconds = 12 * 60 + 40;
+      var windowSeconds = 18 * 60;
+
+      function pad(n) { return String(n).padStart(2, "0"); }
+      function tick() {
+        var a = baseAlt + (Math.random() - 0.5) * 0.6;
+        var d = a - baseAlt;
+        alt.textContent = a.toFixed(1) + " KM";
+        altDelta.textContent = (d >= 0 ? "+" : "") + d.toFixed(1);
+        vel.textContent = (7.66 + (Math.random() - 0.5) * 0.01).toFixed(2) + " KM/S";
+        losSeconds = losSeconds > 0 ? losSeconds - 1 : windowSeconds;
+        los.textContent = "T-" + pad(Math.floor(losSeconds / 60)) + ":" + pad(losSeconds % 60);
+        var pct = (1 - losSeconds / windowSeconds) * 100;
+        fill.style.width = pct + "%";
+        knob.style.left = pct + "%";
+      }
+      tick();
+      setInterval(tick, 1000);
+    })();
+  </script>
+</body>
+</html>

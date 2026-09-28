@@ -1,0 +1,30 @@
+/* Lynx design tokens — canonical values from brand-kit/index.html */
+
+:root {
+  --void: #000000;
+  --object: #f7f7f7;
+  --solar: #56e9fd;
+
+  --void-900: #000000;
+  --void-800: #0a0a0a;
+  --void-700: #141414;
+  --void-600: #1f1f1f;
+  --object-200: #ececec;
+  --solar-700: #0e9eae;
+  --solar-900: #06343a;
+  --flare: #ff6b4a;
+
+  --line-dark: rgba(247, 247, 247, 0.12);
+  --line-dark-strong: rgba(247, 247, 247, 0.22);
+  --text-muted-dark: rgba(247, 247, 247, 0.62);
+  --text-faint-dark: rgba(247, 247, 247, 0.4);
+
+  --font-display: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --tracking-data: 0.1em;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --grid: 24px;
+}

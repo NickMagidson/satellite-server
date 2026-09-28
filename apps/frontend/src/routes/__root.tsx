@@ -18,10 +18,15 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Satellite Server',
+        title: 'Lynx',
       },
     ],
     links: [
+      {
+        rel: 'icon',
+        type: 'image/png',
+        href: '/brand/lynx-mark.png',
+      },
       {
         rel: 'preconnect',
         href: 'https://fonts.googleapis.com',
@@ -48,7 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="font-sans wrap-anywhere antialiased selection:bg-cyan-500/30">
+      <body className="font-sans wrap-anywhere antialiased selection:bg-solar/30">
         <QueryClientProvider client={queryClient}>
           {children}
         </QueryClientProvider>

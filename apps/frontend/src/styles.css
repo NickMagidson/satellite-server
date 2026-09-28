@@ -1,15 +1,37 @@
 @import 'tailwindcss';
 @plugin "@tailwindcss/typography";
+@import './styles/lynx-tokens.css';
 
 @theme {
   --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
-  --color-surface: #020617;
-  --color-surface-raised: #0f172a;
-  --color-border: #334155;
-  --color-ink: #f1f5f9;
-  --color-ink-muted: #94a3b8;
+  --color-void: var(--void);
+  --color-void-900: var(--void-900);
+  --color-void-800: var(--void-800);
+  --color-void-700: var(--void-700);
+  --color-void-600: var(--void-600);
+  --color-object: var(--object);
+  --color-object-200: var(--object-200);
+  --color-solar: var(--solar);
+  --color-solar-700: var(--solar-700);
+  --color-solar-900: var(--solar-900);
+  --color-flare: var(--flare);
+
+  --color-line: var(--line-dark);
+  --color-line-strong: var(--line-dark-strong);
+  --color-ink-muted: var(--text-muted-dark);
+  --color-ink-faint: var(--text-faint-dark);
+
+  /* Legacy aliases — prefer void / object / solar in new UI */
+  --color-surface: var(--void);
+  --color-surface-raised: var(--void-800);
+  --color-border: var(--line-dark-strong);
+  --color-ink: var(--object);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
 }
 
 html,
@@ -24,8 +46,8 @@ html {
 
 body {
   margin: 0;
-  background: var(--color-surface);
-  color: var(--color-ink);
+  background: var(--void);
+  color: var(--object);
   font-family: var(--font-sans);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -34,4 +56,17 @@ body {
 
 .globe-main {
   height: 100dvh;
+}
+
+.text-data {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: var(--tracking-data);
+  text-transform: uppercase;
+}
+
+/* Floating panels over the Cesium globe — raised tint + blur, not fully transparent */
+@utility glass-panel {
+  @apply border border-line-strong bg-void-600/82 shadow-xl backdrop-blur-md ring-1 ring-inset ring-object/5;
 }

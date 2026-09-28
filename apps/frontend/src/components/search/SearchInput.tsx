@@ -42,7 +42,7 @@ export default function SearchInput<TOption>({
   renderOption,
   placeholder = 'Search...',
   emptyMessage = 'No results found.',
-  leadingIcon = <Search className="size-4 text-slate-300" aria-hidden="true" />,
+  leadingIcon = <Search className="size-4 text-ink-muted" aria-hidden="true" />,
   className,
   inputClassName,
   panelClassName,
@@ -64,12 +64,12 @@ export default function SearchInput<TOption>({
     >
       <div className={cx('relative', className)}>
         <div className="relative">
-          <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-slate-300">
+          <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-ink-muted">
             {leadingIcon}
           </span>
           <ComboboxInput
             className={cx(
-              'block w-full rounded-md border border-slate-700 bg-slate-950/90 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-500 shadow-lg backdrop-blur focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 data-disabled:cursor-not-allowed data-disabled:bg-slate-900 data-disabled:text-slate-500',
+              'block w-full rounded-md border border-line-strong bg-void-600 py-2 pl-9 pr-3 text-sm text-object placeholder:text-ink-muted shadow-lg backdrop-blur focus:outline-none focus-visible:ring-2 focus-visible:ring-solar/60 focus-visible:ring-offset-2 focus-visible:ring-offset-void data-disabled:cursor-not-allowed data-disabled:bg-void-800 data-disabled:text-ink-faint',
               inputClassName,
             )}
             displayValue={(option: TOption | null) =>
@@ -82,12 +82,12 @@ export default function SearchInput<TOption>({
 
         <ComboboxOptions
           className={cx(
-            'absolute z-20 mt-2 max-h-72 w-full overflow-auto rounded-md border border-slate-700 bg-slate-950/95 p-1 text-sm shadow-lg backdrop-blur focus:outline-none',
+            'glass-panel absolute z-20 mt-2 max-h-72 w-full overflow-auto rounded-md p-1 text-sm focus:outline-none',
             panelClassName,
           )}
         >
           {showEmptyMessage ? (
-            <div className="px-3 py-2 text-slate-400">{emptyMessage}</div>
+            <div className="px-3 py-2 text-ink-muted">{emptyMessage}</div>
           ) : (
             options.map((option) => (
               <ComboboxOption
@@ -95,9 +95,9 @@ export default function SearchInput<TOption>({
                 value={option}
                 className={({ focus, selected }) =>
                   cx(
-                    'cursor-pointer rounded px-3 py-2 text-slate-300 data-disabled:cursor-not-allowed data-disabled:text-slate-500',
-                    focus && 'bg-slate-800 text-slate-50',
-                    selected && 'font-medium text-slate-50',
+                    'cursor-pointer rounded px-3 py-2 text-ink-muted data-disabled:cursor-not-allowed data-disabled:text-ink-faint',
+                    focus && 'bg-void-700 text-object',
+                    selected && 'font-medium text-object',
                     optionClassName,
                   )
                 }
@@ -108,7 +108,7 @@ export default function SearchInput<TOption>({
                   <div>
                     <div>{getOptionLabel(option)}</div>
                     {getOptionDescription ? (
-                      <div className="font-mono text-xs text-slate-500 tabular-nums">
+                      <div className="font-mono text-xs text-ink-faint tabular-nums">
                         {getOptionDescription(option)}
                       </div>
                     ) : null}

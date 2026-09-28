@@ -38,11 +38,11 @@ export default function SatelliteFilterPanel({
             ? `Filters, ${activeCategoryCount} active`
             : 'Filters'
         }
-        className="relative flex size-10 items-center justify-center rounded-sm border border-white/10 bg-slate-950/85 text-slate-200 shadow-lg backdrop-blur transition hover:bg-slate-800 hover:text-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+        className="relative flex size-10 items-center justify-center rounded-sm border border-line-strong bg-void-600 text-object shadow-lg backdrop-blur transition hover:bg-void-700 hover:text-object focus:outline-none focus-visible:ring-2 focus-visible:ring-solar/60"
       >
         <SlidersHorizontal className="size-4" aria-hidden="true" />
         {activeCategoryCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-sm bg-cyan-500 text-[10px] font-semibold leading-none text-slate-950">
+          <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-sm bg-solar text-[10px] font-semibold leading-none text-void">
             {activeCategoryCount}
           </span>
         )}
@@ -50,15 +50,15 @@ export default function SatelliteFilterPanel({
 
       <PopoverPanel
         anchor="bottom end"
-        className="z-40 mt-2 w-72 rounded-sm border border-slate-700/80 bg-slate-950/95 p-3 shadow-xl backdrop-blur"
+        className="glass-panel z-40 mt-2 w-72 rounded-sm p-3"
       >
         <div className="mb-3 flex items-center justify-between gap-2">
-          <p className="text-sm font-medium text-slate-100">Filters</p>
+          <p className="text-sm font-medium text-object">Filters</p>
           {activeCategoryCount > 0 && (
             <button
               type="button"
               onClick={onReset}
-              className="rounded-sm px-1 py-0.5 text-xs font-medium text-cyan-400 hover:text-cyan-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="rounded-sm px-1 py-0.5 text-xs font-medium text-solar hover:text-object focus:outline-none focus-visible:ring-2 focus-visible:ring-solar/60"
             >
               Reset
             </button>
@@ -67,9 +67,7 @@ export default function SatelliteFilterPanel({
 
         <div className="space-y-3">
           <div>
-            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">
-              Orbit class
-            </p>
+            <p className="text-data mb-1 text-ink-muted">Orbit class</p>
             <MultiSelectFilter
               label="Orbit class"
               options={options.orbitClasses.map((orbitClass) => ({
@@ -84,9 +82,7 @@ export default function SatelliteFilterPanel({
           </div>
 
           <div>
-            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">
-              Object type
-            </p>
+            <p className="text-data mb-1 text-ink-muted">Object type</p>
             <MultiSelectFilter
               label="Object type"
               options={options.objectTypes.map((objectType) => ({
@@ -99,9 +95,7 @@ export default function SatelliteFilterPanel({
           </div>
 
           <div>
-            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">
-              Country
-            </p>
+            <p className="text-data mb-1 text-ink-muted">Country</p>
             <MultiSelectFilter
               label="Country"
               options={options.countryCodes.map((countryCode) => ({

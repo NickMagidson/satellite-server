@@ -20,7 +20,7 @@ Work may start from a **GitHub issue** or a **direct prompt** — classification
 |----------|-------------------|----------------|
 | API change | `apps/api/src/routes/`, `services/`, `validation/` | Core + [Testing](./skills/SKILL-TESTING.md), [Build](./skills/SKILL-BUILD.md) |
 | Data model change | `packages/db/prisma/` | Core + [Build](./skills/SKILL-BUILD.md) (`db:generate`, migrate); [Testing](./skills/SKILL-TESTING.md) if API store logic changes |
-| Frontend UI change | `apps/frontend/src/components/`, shared layout | Core + [Linting](./skills/SKILL-LINTING.md), [Build](./skills/SKILL-BUILD.md) |
+| Frontend UI change | `apps/frontend/src/components/`, shared layout | Core + [Brand / UI](./skills/SKILL-BRAND-UI.md), [Linting](./skills/SKILL-LINTING.md), [Build](./skills/SKILL-BUILD.md) |
 | Routing change | `apps/frontend/src/routes/` | Core + [Linting](./skills/SKILL-LINTING.md), [Build](./skills/SKILL-BUILD.md) |
 | Data fetching (frontend) | `hooks/`, `lib/`, route loaders | Core + [Pattern lookup](./skills/SKILL-PATTERN-LOOKUP.md), [Linting](./skills/SKILL-LINTING.md), [Build](./skills/SKILL-BUILD.md) |
 | Cesium / globe change | `CesiumViewer.tsx`, globe routes, motion worker, Cesium helpers | Core + [Cesium viewer](./skills/SKILL-CESIUM-VIEWER-CHANGE.md), [Using CesiumJS skills](./skills/CESIUM-SKILLS/using-cesiumjs-skills/SKILL.md), matching [CesiumJS domain skill(s)](./SKILLS.md#cesiumjs-domain-skills), [Linting](./skills/SKILL-LINTING.md), [Build](./skills/SKILL-BUILD.md) |
