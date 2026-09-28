@@ -99,7 +99,7 @@ export default function SatelliteDetailPanel({
 
       <CardBody className="max-h-[min(70vh,calc(100dvh-6rem))] space-y-4 overflow-y-auto p-3">
         <section>
-          <h3 className="text-base text-object">Catalog</h3>
+          <h3 className="text-lg font-medium text-object">Catalog</h3>
           <ReadoutList>
             <DetailRow label="NORAD ID" value={satellite.noradCatId} />
             <DetailRow
@@ -114,7 +114,7 @@ export default function SatelliteDetailPanel({
         </section>
 
         <section>
-          <h3 className="text-base text-object">Orbital elements</h3>
+          <h3 className="text-lg font-medium text-object">Orbital elements</h3>
           <ReadoutList>
             <DetailRow label="Epoch" value={formatDate(epoch)} />
             <DetailRow
@@ -181,7 +181,7 @@ export default function SatelliteDetailPanel({
         </section>
 
         <section>
-          <h3 className="text-base text-object">Current position</h3>
+          <h3 className="text-lg font-medium text-object">Current position</h3>
           {position ? (
             <ReadoutList>
               <DetailRow
