@@ -76,7 +76,7 @@ Intentional choices in this repository. Do not change these patterns unless the 
 | Compose project name | `satellite-server` (via Makefile) |
 | Migrate on compose up | `migrate` service runs `db:migrate:deploy` before API starts |
 | Prisma Studio | Port `5555`; `make studio` |
-| Railway | Separate `Dockerfile.api` / `Dockerfile.frontend` + `railway.api.toml` / `railway.frontend.toml` (Railway cannot pass Docker `--target`) |
+| Production images | Multi-stage `Dockerfile` (Compose/CI use `--target`); Render uses `Dockerfile.api` / `Dockerfile.frontend` (last stage = runtime) |
 | API container start | `node apps/api/dist/server.js` (not `npm --workspace`) |
 
 ## Explicit non-goals (for now)
@@ -89,8 +89,15 @@ Intentional choices in this repository. Do not change these patterns unless the 
 - pnpm or Turborepo
 - Production frontend in Docker compose (dev compose serves Vite)
 
+## Product UI branding (Lynx)
+
+- **Product name in the app:** Lynx (see [`BRAND.md`](./BRAND.md)).
+- **Repo name:** Satellite Server — unchanged.
+- **Tokens:** `apps/frontend/src/styles/lynx-tokens.css` is canonical; `brand-kit/` is the visual reference, not imported at runtime.
+
 ## Related
 
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md)
+- [`BRAND.md`](./BRAND.md)
 - [`STYLES.md`](./STYLES.md)
 - [`skills/SKILL-SATELLITE-PROPAGATION-BASICS.md`](./skills/SKILL-SATELLITE-PROPAGATION-BASICS.md)

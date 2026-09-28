@@ -25,9 +25,9 @@ If no screenshot is attached, ask for one. If the purpose of the screen is uncle
 
 ## App context
 
-- Dark-only UI (`color-scheme: dark`). Theme tokens live in `apps/frontend/src/styles.css`: `surface` #020617, `surface-raised` #0f172a, `border` #334155, `ink` #f1f5f9, `ink-muted` #94a3b8. Fonts are IBM Plex Sans / Mono.
+- Dark-only UI (`color-scheme: dark`). Lynx tokens: `void` #000, `object` #f7f7f7, `solar` #56e9fd (accent/focus), `flare` #ff6b4a (fault). See `docs/BRAND.md` and `apps/frontend/src/styles/lynx-tokens.css`. Fonts: IBM Plex Sans / Mono; data labels use `.text-data`.
 - Stack: React 19, Tailwind v4, Headless UI, `lucide-react` icons.
-- Panels are translucent cards (`bg-slate-950/90 backdrop-blur`) floating over a full-viewport Cesium globe. Judge legibility against busy globe imagery, and check that panels don't hide the content the user is trying to look at.
+- Panels are translucent cards (`bg-void/90 backdrop-blur`, `Card`) floating over a full-viewport Cesium globe. Judge legibility against busy globe imagery, and check that panels don't hide the content the user is trying to look at.
 - The domain is data-dense (satellite names, NORAD IDs, orbital values). Favor scannability, consistent units, and monospace for numbers that users compare.
 
 ## Severity rubric

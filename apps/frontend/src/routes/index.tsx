@@ -97,11 +97,11 @@ function GlobePage() {
   }
 
   return (
-    <main className="globe-main relative w-full overflow-hidden bg-slate-950">
+    <main className="globe-main relative w-full overflow-hidden bg-void">
       <div className="absolute left-4 top-4 z-10 flex w-96 items-start gap-2">
         <SearchInput
           className="min-w-0 flex-1"
-          inputClassName="h-10 rounded-full border-white/10 focus-visible:ring-cyan-400/60"
+          inputClassName="h-10 rounded-sm border-line-strong focus-visible:ring-solar/60"
           panelClassName="z-30"
           options={searchResults}
           value={selectedSatellite}
@@ -133,7 +133,7 @@ function GlobePage() {
         <button
           type="button"
           onClick={() => cesiumViewerRef.current?.recenter()}
-          className="flex size-10 shrink-0 items-center justify-center rounded-sm border border-white/10 bg-slate-950/85 text-slate-200 shadow-lg backdrop-blur transition hover:bg-slate-800 hover:text-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+          className="flex size-10 shrink-0 items-center justify-center rounded-sm border border-line-strong bg-void-600 text-object shadow-lg backdrop-blur transition hover:bg-void-700 hover:text-object focus:outline-none focus-visible:ring-2 focus-visible:ring-solar/60"
           title="Re-center globe"
           aria-label="Re-center globe"
         >
@@ -142,7 +142,7 @@ function GlobePage() {
       </div>
 
       {(motion.isError || satellitesQuery.isError) && (
-        <p className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-md border border-red-500/40 bg-slate-950/90 px-3 py-2 text-sm text-red-300 shadow-sm backdrop-blur">
+        <p className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-md border border-flare/40 bg-void-600 px-3 py-2 text-sm text-flare shadow-sm backdrop-blur">
           {dataError instanceof Error
             ? dataError.message
             : 'Failed to load satellite data.'}
@@ -157,10 +157,11 @@ function GlobePage() {
         leaveFrom="opacity-100 translate-x-0"
         leaveTo="opacity-0 translate-x-4"
       >
-        <div className="absolute right-4 top-4 z-10 w-80 transform">
+        <div className="absolute right-4 top-4 z-10 w-96 transform">
           {selectedSatellite ? (
             <SatelliteDetailPanel
               satellite={selectedSatellite}
+              omm={motion.ommById.get(selectedSatellite.id) ?? null}
               position={selectedPositionDetail}
               onClose={() => {
                 setSelectedSatellite(null)
@@ -178,7 +179,7 @@ function GlobePage() {
         className="h-full w-full"
       />
       {(motion.isPending || satellitesQuery.isPending) && (
-        <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md border border-slate-700/80 bg-slate-950/90 px-3 py-2 text-sm text-slate-300 shadow-sm backdrop-blur">
+        <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md border border-line-strong bg-void-600 px-3 py-2 text-sm text-ink-muted shadow-sm backdrop-blur">
           {motion.isPending
             ? 'Loading satellite motion...'
             : 'Loading satellite catalog...'}
@@ -188,7 +189,7 @@ function GlobePage() {
         !satellitesQuery.isPending &&
         satellites.length > 0 &&
         filteredSatellites.length === 0 && (
-          <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md border border-slate-700/80 bg-slate-950/90 px-3 py-2 text-sm text-slate-300 shadow-sm backdrop-blur">
+          <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md border border-line-strong bg-void-600 px-3 py-2 text-sm text-ink-muted shadow-sm backdrop-blur">
             No satellites match these filters.
           </p>
         )}

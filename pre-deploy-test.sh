@@ -9,7 +9,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}🚀 Pre-Deploy Test Suite for Railway${NC}"
+echo -e "${BLUE}🚀 Pre-Deploy Test Suite${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
@@ -68,8 +68,8 @@ fi
 echo ""
 
 echo -e "${BLUE}Step 7: Docker Build Tests${NC}"
-echo -e "${YELLOW}7️⃣  Building API Docker image (Dockerfile.api for Railway)...${NC}"
-if docker build -f Dockerfile.api -t satellite-api:test . > /tmp/api-build.log 2>&1; then
+echo -e "${YELLOW}7️⃣  Building API Docker image (Dockerfile --target api-runtime)...${NC}"
+if docker build -f Dockerfile --target api-runtime -t satellite-api:test . > /tmp/api-build.log 2>&1; then
     echo -e "${GREEN}✅ API Docker build successful${NC}"
 else
     echo -e "${RED}❌ API Docker build failed. Check /tmp/api-build.log for details${NC}"
@@ -77,14 +77,14 @@ else
 fi
 echo ""
 
-echo -e "${YELLOW}7️⃣  Building Frontend Docker image (Dockerfile.frontend for Railway)...${NC}"
+echo -e "${YELLOW}7️⃣  Building Frontend Docker image (Dockerfile --target frontend-runtime)...${NC}"
 if [ -z "$VITE_CESIUM_ION_ACCESS_TOKEN" ]; then
     echo -e "${YELLOW}⚠️  Warning: VITE_CESIUM_ION_ACCESS_TOKEN not set${NC}"
     echo -e "${YELLOW}   Using placeholder token for build test${NC}"
     VITE_CESIUM_ION_ACCESS_TOKEN="placeholder_for_build_test"
 fi
 
-if docker build -f Dockerfile.frontend \
+if docker build -f Dockerfile --target frontend-runtime \
     --build-arg VITE_API_URL=http://localhost:3000 \
     --build-arg VITE_CESIUM_ION_ACCESS_TOKEN="${VITE_CESIUM_ION_ACCESS_TOKEN}" \
     -t satellite-frontend:test . > /tmp/frontend-build.log 2>&1; then
@@ -98,7 +98,7 @@ echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 if [ $FAILED -eq 0 ]; then
     echo -e "${GREEN}✅ All pre-deploy tests passed!${NC}"
-    echo -e "${GREEN}   Ready for Railway deployment${NC}"
+    echo -e "${GREEN}   Ready for deployment${NC}"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     exit 0
 else

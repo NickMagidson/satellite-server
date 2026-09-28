@@ -30,6 +30,7 @@ Skills are procedural instructions for completing specific types of work safely.
 | Skill | When to use | Reference |
 |-------|-------------|-----------|
 | Cesium viewer change | Globe integration in this app (API wiring, React lifecycle, km→m) | [`skills/SKILL-CESIUM-VIEWER-CHANGE.md`](./skills/SKILL-CESIUM-VIEWER-CHANGE.md) |
+| Brand / UI (Lynx) | Colors, typography, shared chrome, marketing shell | [`skills/SKILL-BRAND-UI.md`](./skills/SKILL-BRAND-UI.md) |
 | Satellite propagation basics | TLE, OMM, SGP4, coordinate frames (reference) | [`skills/SKILL-SATELLITE-PROPAGATION-BASICS.md`](./skills/SKILL-SATELLITE-PROPAGATION-BASICS.md) |
 
 ## CesiumJS domain skills

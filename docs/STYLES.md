@@ -72,7 +72,8 @@ src/
 - **API client:** Centralize fetch logic in `lib/satelliteApi.ts`; export types alongside functions. Extend types when consuming new response fields (`eci`, `velocityEci`, etc.).
 - **Type guards:** `isSatellitePositionOk()` for discriminated union on `status`.
 - **Cesium:** Keep viewer lifecycle in `CesiumViewer.tsx`; cleanup with `viewer.destroy()` on unmount.
-- **Styling:** Tailwind utility classes; CSS variables for theme (`--sea-ink`, `--line`, etc. in `styles.css`).
+- **Styling:** Tailwind utility classes; Lynx theme tokens in `styles/lynx-tokens.css` and `@theme` in `styles.css` (`void`, `object`, `solar`, etc.). See [`BRAND.md`](./BRAND.md).
+- **UI primitives:** `components/ui/Button.tsx`, `components/ui/Card.tsx` for branded controls and panels.
 
 ### Naming
 
@@ -120,6 +121,7 @@ Frontend ESLint: `eslint.config.js` (TanStack config). Match existing quote styl
 
 ## Related
 
+- [`BRAND.md`](./BRAND.md)
 - [`skills/SKILL-PATTERN-LOOKUP.md`](./skills/SKILL-PATTERN-LOOKUP.md)
 - [`skills/SKILL-LINTING.md`](./skills/SKILL-LINTING.md)
 - [`DECISIONS.md`](./DECISIONS.md)

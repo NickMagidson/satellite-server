@@ -1,6 +1,8 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 
-type CardProps = ComponentPropsWithoutRef<'section'>
+type CardProps = ComponentPropsWithoutRef<'section'> & {
+  tone?: 'dark' | 'glass'
+}
 
 interface CardSectionProps {
   children: ReactNode
@@ -11,11 +13,14 @@ function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ')
 }
 
-function Card({ className, ...props }: CardProps) {
+function Card({ className, tone = 'glass', ...props }: CardProps) {
   return (
     <section
       className={cx(
-        'rounded-xl border border-slate-700/80 bg-slate-950/90 text-slate-100 shadow-xl backdrop-blur',
+        'rounded-md text-object',
+        tone === 'dark'
+          ? 'border border-void bg-void shadow-xl'
+          : 'glass-panel',
         className,
       )}
       {...props}
@@ -25,9 +30,7 @@ function Card({ className, ...props }: CardProps) {
 
 function CardHeader({ children, className }: CardSectionProps) {
   return (
-    <div className={cx('border-b border-slate-700/80 p-4', className)}>
-      {children}
-    </div>
+    <div className={cx('border-b border-line p-4', className)}>{children}</div>
   )
 }
 
@@ -37,9 +40,7 @@ function CardBody({ children, className }: CardSectionProps) {
 
 function CardFooter({ children, className }: CardSectionProps) {
   return (
-    <div className={cx('border-t border-slate-700/80 p-4', className)}>
-      {children}
-    </div>
+    <div className={cx('border-t border-line p-4', className)}>{children}</div>
   )
 }
 

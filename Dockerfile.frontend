@@ -1,7 +1,7 @@
-# Frontend production image for Railway.
-# Railway always builds the last stage and does not support `docker build --target`.
-# Keep stages aligned with the `dev` → `build` → `frontend-runtime` path in ./Dockerfile.
-# Local Compose continues to use ./Dockerfile with `--target frontend-runtime`.
+# Frontend production image for Render (lynxspace).
+# Render builds the last stage and does not pass `docker build --target`.
+# Keep stages aligned with `dev` → `build` → `frontend-runtime` in ./Dockerfile.
+# Local Compose uses ./Dockerfile with `--target frontend-runtime`.
 
 FROM node:24-alpine AS dev
 

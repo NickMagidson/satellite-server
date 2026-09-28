@@ -110,25 +110,18 @@ make dev
 
 The API is exposed at `http://localhost:3000`, the frontend (dev mode) is exposed at `http://localhost:5173`, and Prisma Studio is available on demand at `http://localhost:5555` after running `make studio`. Inside the dev containers, Postgres is reachable at `postgres:5432` with `DATABASE_URL` from `.env` (default `postgresql://satellite:satellite@postgres:5432/satellite`). `make up`, `make down`, `make logs`, `make exec`, `make psql`, and `make studio` operate on the dev stack (API + frontend Vite dev servers). Use `make exec` when you need an interactive shell in the API container.
 
-For **production Compose** (API + frontend + Postgres all in runtime mode), use `docker compose up -d --build` directly (not `make dev`). The production frontend runs TanStack Start's SSR server via `srvx`, not Vite dev.
+For **production Compose** (API + frontend + Postgres all in runtime mode), use `docker compose up -d --build` directly (not `make dev`). The production frontend runs TanStack Start's SSR server via `srvx`, not Vite dev. Production images are built from the multi-stage `Dockerfile` with `--target api-runtime` or `frontend-runtime` (see `docker-compose.yml`).
 
-## Deploy on Railway
+## Deploy on Render
 
-This is an npm workspaces monorepo. Each Railway service must use the **repo root** as its root directory (not `apps/api` or `apps/frontend`), and must build with the matching Dockerfile. Railway cannot pass `docker build --target`, so dedicated Dockerfiles exist for each service.
+Render Docker services build the **last** Dockerfile stage (no `--target`). Use dedicated entrypoints that match the dashboard:
 
-| Service | Config-as-code file | Dockerfile |
-|---------|---------------------|------------|
-| API | `railway.api.toml` | `Dockerfile.api` |
-| Frontend | `railway.frontend.toml` | `Dockerfile.frontend` |
+| Service | Dockerfile | Docker command (dashboard) |
+|---------|------------|----------------------------|
+| API (`lynxspace-api`) | `Dockerfile.api` | `node apps/api/dist/server.js` |
+| Frontend (`lynxspace`) | `Dockerfile.frontend` | `npx srvx --prod -s ../client dist/server/server.js` |
 
-For each service in the Railway dashboard:
-
-1. Set **Root Directory** to empty / `/` (monorepo root).
-2. Set the **Config-as-code** path to `railway.api.toml` or `railway.frontend.toml`.
-3. Clear any custom start command that uses `npm --workspace=...` (the toml pins `node apps/api/dist/server.js` for the API).
-4. Provide `DATABASE_URL` (and other API env vars) on the API service; set `VITE_API_URL` / `VITE_CESIUM_ION_ACCESS_TOKEN` as build-time variables on the frontend service.
-
-Local Compose continues to use the multi-stage `Dockerfile` with `--target api-runtime` / `frontend-runtime`.
+Set frontend build-time env vars (`VITE_API_URL`, `VITE_CESIUM_ION_ACCESS_TOKEN`) on the frontend service. API env template: `.env.render.api` (gitignored when filled in).
 
 ## Database Migrations
 

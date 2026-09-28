@@ -8,6 +8,7 @@ import type {
   CameraState,
   MainToWorkerMessage,
   SatelliteElement,
+  SatelliteOmmRecord,
   SelectedPositionDetail,
   WorkerToMainMessage,
 } from '../lib/satelliteMotion/types'
@@ -24,6 +25,7 @@ export interface SatelliteMotionHandle {
   idByIndex: string[]
   nameByIndex: string[]
   indexById: Map<string, number>
+  ommById: Map<string, SatelliteOmmRecord>
   setCameraState: (camera: CameraState) => void
   setSelectedIndex: (index: number | null) => void
   selectedDetail: SelectedPositionDetail | null
@@ -105,6 +107,13 @@ export function useSatelliteMotionWorker(
     })
     return map
   }, [elements])
+  const ommById = useMemo(() => {
+    const map = new Map<string, SatelliteOmmRecord>()
+    for (const element of elementsQuery.data?.elements ?? []) {
+      map.set(element.id, element.omm)
+    }
+    return map
+  }, [elementsQuery.data?.elements])
 
   const catalogKey = useMemo(
     () =>
@@ -264,6 +273,7 @@ export function useSatelliteMotionWorker(
     idByIndex,
     nameByIndex,
     indexById,
+    ommById,
     setCameraState,
     setSelectedIndex,
     selectedDetail,

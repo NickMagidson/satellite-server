@@ -1,7 +1,7 @@
-# API production image for Railway.
-# Railway always builds the last stage and does not support `docker build --target`.
-# Keep stages aligned with the `dev` → `build` → `api-runtime` path in ./Dockerfile.
-# Local Compose continues to use ./Dockerfile with `--target api-runtime`.
+# API production image for Render (lynxspace-api).
+# Render builds the last stage and does not pass `docker build --target`.
+# Keep stages aligned with `dev` → `build` → `api-runtime` in ./Dockerfile.
+# Local Compose uses ./Dockerfile with `--target api-runtime`.
 
 FROM node:24-alpine AS dev
 

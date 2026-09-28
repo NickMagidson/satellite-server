@@ -61,7 +61,7 @@ USER node
 
 EXPOSE 3000
 
-# Avoid `npm --workspace` at runtime — Railway and slim images can lack a
+# Avoid `npm --workspace` at runtime — slim production images may lack a
 # resolvable workspace graph even when the monorepo root package.json is present.
 CMD ["node", "apps/api/dist/server.js"]
 
@@ -85,9 +85,3 @@ EXPOSE 5173
 WORKDIR /app/apps/frontend
 
 CMD ["npm", "run", "start"]
-
-# Railway cannot pass `docker build --target`. The final stage below is what
-# Railway builds by default when using this Dockerfile (API). For the frontend
-# service, use Dockerfile.frontend instead (see railway.frontend.toml).
-ARG RUNTIME_TARGET=api-runtime
-FROM ${RUNTIME_TARGET} AS railway-runtime
