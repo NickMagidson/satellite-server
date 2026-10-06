@@ -21,12 +21,6 @@ interface CesiumEntity {
   id?: string
 }
 
-interface CesiumSelectionEntity extends CesiumEntity {
-  position: {
-    setValue: (value: unknown) => void
-  }
-}
-
 interface CesiumEvent {
   addEventListener: (listener: (...args: never[]) => void) => () => void
 }
@@ -101,15 +95,19 @@ interface CesiumViewerInstance {
     ) => void
     removeInputAction: (type: unknown) => void
   }
+  entities: {
+    add: (entity: CesiumEntity) => CesiumEntity
+  }
   selectedEntity: CesiumEntity | undefined
   trackedEntity: CesiumEntity | undefined
+  trackedEntityChanged: CesiumEvent
   destroy: () => void
   isDestroyed: () => boolean
 }
 
 interface CesiumNamespace {
   Ion: { defaultAccessToken: string }
-  Entity: new (options: Record<string, unknown>) => CesiumSelectionEntity
+  Entity: new (options: Record<string, unknown>) => CesiumEntity
   Viewer: new (
     element: HTMLElement,
     options: Record<string, unknown>,
@@ -126,8 +124,14 @@ interface CesiumNamespace {
       height: number,
     ) => unknown
   }
-  ConstantPositionProperty: new (value: unknown) => unknown
-  Color: { CYAN: unknown; WHITE: unknown }
+  CallbackPositionProperty: new (
+    callback: (
+      time: unknown,
+      result?: CesiumCartesian3,
+    ) => CesiumCartesian3 | undefined,
+    isConstant: boolean,
+  ) => unknown
+  Color: { CYAN: unknown; WHITE: unknown; TRANSPARENT: unknown }
   Math: { toRadians: (degrees: number) => number }
   PointPrimitiveCollection: new () => CesiumPointPrimitiveCollection
   ScreenSpaceEventType: { LEFT_CLICK: unknown }
@@ -146,6 +150,7 @@ interface CesiumViewerProps {
   motion: SatelliteMotionHandle
   selectedEntityId?: string | null
   onSelectedEntityIdChange?: (entityId: string | null) => void
+  onTrackingChange?: (isTracking: boolean) => void
   className?: string
 }
 
@@ -160,6 +165,7 @@ interface StoredHomeView {
 
 export interface CesiumViewerHandle {
   recenter: () => void
+  setTracking: (enabled: boolean) => void
 }
 
 function buildStartViewOptions(Cesium: CesiumNamespace): StoredHomeView {
@@ -205,6 +211,8 @@ const CESIUM_SCRIPT_SRC = `${__CESIUM_RUNTIME_BASE__}Cesium.js`
 const CESIUM_STYLE_HREF = `${__CESIUM_RUNTIME_BASE__}Widgets/widgets.css`
 const SATELLITE_POINT_SIZE = 2
 const CAMERA_THROTTLE_MS = 100
+/** Tracking camera offset from the satellite in its local east-north-up frame, in meters. */
+const TRACKING_VIEW_FROM = { east: 0, north: -1, up: 300_000 } as const
 
 /** NASA Tycho Catalog Skymap (SVS) as a 2K cube map — denser than Cesium's default stars. */
 const NASA_DEEP_SPACE_SKYBOX = {
@@ -307,26 +315,38 @@ function loadCesium(): Promise<CesiumNamespace> {
 
 const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
   function CesiumViewer(
-    { motion, selectedEntityId = null, onSelectedEntityIdChange, className },
+    {
+      motion,
+      selectedEntityId = null,
+      onSelectedEntityIdChange,
+      onTrackingChange,
+      className,
+    },
     ref,
   ) {
     const containerRef = useRef<HTMLDivElement>(null)
     const viewerRef = useRef<CesiumViewerInstance | null>(null)
     const cesiumApiRef = useRef<CesiumNamespace | null>(null)
     const pointsRef = useRef<Map<string, CesiumPointPrimitive>>(new Map())
-    const selectionEntityRef = useRef<CesiumSelectionEntity | null>(null)
+    const selectionEntityRef = useRef<CesiumEntity | null>(null)
     const pointCollectionRef = useRef<CesiumPointPrimitiveCollection | null>(
       null,
     )
     const onSelectedEntityIdChangeRef = useRef(onSelectedEntityIdChange)
+    const onTrackingChangeRef = useRef(onTrackingChange)
     const motionRef = useRef(motion)
     const selectedEntityIdRef = useRef(selectedEntityId)
+    const previousSelectedEntityIdRef = useRef<string | null>(null)
     const homeViewRef = useRef<StoredHomeView | null>(null)
     const [viewerReady, setViewerReady] = useState(false)
 
     useEffect(() => {
       onSelectedEntityIdChangeRef.current = onSelectedEntityIdChange
     }, [onSelectedEntityIdChange])
+
+    useEffect(() => {
+      onTrackingChangeRef.current = onTrackingChange
+    }, [onTrackingChange])
 
     useEffect(() => {
       motionRef.current = motion
@@ -351,7 +371,20 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
             homeViewRef.current = buildStartViewOptions(Cesium)
           }
 
+          viewer.trackedEntity = undefined
           applyStartView(viewer, homeViewRef.current)
+        },
+        setTracking: (enabled) => {
+          const viewer = viewerRef.current
+          if (!viewer) {
+            return
+          }
+
+          viewer.trackedEntity =
+            enabled && selectedEntityIdRef.current
+              ? (selectionEntityRef.current ?? undefined)
+              : undefined
+          viewer.scene.requestRender()
         },
       }),
       [],
@@ -362,6 +395,7 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
       let CesiumApi: CesiumNamespace | null = null
       let removePreRender: (() => void) | null = null
       let removeCameraChanged: (() => void) | null = null
+      let removeTrackedEntityChanged: (() => void) | null = null
 
       async function init() {
         ensureCesiumStylesheet()
@@ -441,12 +475,41 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
         const pointCollection = new Cesium.PointPrimitiveCollection()
         viewer.scene.primitives.add(pointCollection)
         pointCollectionRef.current = pointCollection
-        selectionEntityRef.current = new Cesium.Entity({
-          id: 'selected-satellite',
-          position: new Cesium.ConstantPositionProperty(
-            new Cesium.Cartesian3(0, 0, 0),
-          ),
-        })
+        // Cesium only tracks entities that belong to a data source, and only
+        // follows them each tick when a visualizer reports a bounding sphere,
+        // hence the invisible point graphic.
+        selectionEntityRef.current = viewer.entities.add(
+          new Cesium.Entity({
+            id: 'selected-satellite',
+            point: { pixelSize: 1, color: Cesium.Color.TRANSPARENT },
+            viewFrom: new Cesium.Cartesian3(
+              TRACKING_VIEW_FROM.east,
+              TRACKING_VIEW_FROM.north,
+              TRACKING_VIEW_FROM.up,
+            ),
+            position: new Cesium.CallbackPositionProperty((_time, result) => {
+              const selectedId = selectedEntityIdRef.current
+              const position = selectedId
+                ? (pointsRef.current.get(selectedId)?.position as
+                    | CesiumCartesian3
+                    | undefined)
+                : undefined
+              if (!position) {
+                return undefined
+              }
+
+              const out = result ?? new Cesium.Cartesian3(0, 0, 0)
+              out.x = position.x
+              out.y = position.y
+              out.z = position.z
+              return out
+            }, false),
+          }),
+        )
+        removeTrackedEntityChanged =
+          viewer.trackedEntityChanged.addEventListener(() => {
+            onTrackingChangeRef.current?.(viewer.trackedEntity !== undefined)
+          })
         setViewerReady(true)
         logSatellitePerf('cesium_viewer_ready', {
           durationMs: Math.round(performance.now() - initStartedAt),
@@ -456,11 +519,12 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
           const picked = viewer.scene.pick(click.position)
           const pickedId = Cesium.defined(picked?.id) ? picked?.id : undefined
           const entityId =
-            typeof pickedId === 'string' && pointsRef.current.has(pickedId)
-              ? pickedId
-              : null
+            pickedId !== undefined && pickedId === selectionEntityRef.current
+              ? selectedEntityIdRef.current
+              : typeof pickedId === 'string' && pointsRef.current.has(pickedId)
+                ? pickedId
+                : null
 
-          viewer.trackedEntity = undefined
           viewer.selectedEntity = entityId
             ? (selectionEntityRef.current ?? undefined)
             : undefined
@@ -532,14 +596,6 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
             point.position = scratchCartesian
           }
 
-          const selectedId = selectedEntityIdRef.current
-          const selectedPoint = selectedId ? points.get(selectedId) : undefined
-          if (selectedPoint) {
-            selectionEntityRef.current?.position.setValue(
-              selectedPoint.position,
-            )
-          }
-
           if (perfLoggingEnabled) {
             const now = performance.now()
             const durationMs = now - updateStartedAt
@@ -583,6 +639,7 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
         setViewerReady(false)
         removePreRender?.()
         removeCameraChanged?.()
+        removeTrackedEntityChanged?.()
         const viewer = viewerRef.current
         if (viewer && CesiumApi) {
           viewer.screenSpaceEventHandler.removeInputAction(
@@ -669,16 +726,13 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
           : (motion.indexById.get(selectedEntityId) ?? null)
       motion.setSelectedIndex(selectedIndex)
 
-      viewer.trackedEntity = undefined
+      if (previousSelectedEntityIdRef.current !== selectedEntityId) {
+        previousSelectedEntityIdRef.current = selectedEntityId
+        viewer.trackedEntity = undefined
+      }
       viewer.selectedEntity = selectedEntityId
         ? (selectionEntityRef.current ?? undefined)
         : undefined
-      const selectedPoint = selectedEntityId
-        ? pointsRef.current.get(selectedEntityId)
-        : undefined
-      if (selectedPoint) {
-        selectionEntityRef.current?.position.setValue(selectedPoint.position)
-      }
       viewer.scene.requestRender()
     }, [
       viewerReady,

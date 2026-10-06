@@ -58,6 +58,20 @@ body {
   height: 100dvh;
 }
 
+@keyframes lynx-load-bar {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+.lynx-load-bar {
+  animation: lynx-load-bar 1.2s ease-in-out infinite;
+}
+
 .text-data {
   font-family: var(--font-mono);
   font-size: 10px;

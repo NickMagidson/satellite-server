@@ -26,6 +26,7 @@ function GlobePage() {
   const [query, setQuery] = useState('')
   const [selectedSatellite, setSelectedSatellite] =
     useState<SatelliteMetadata | null>(null)
+  const [isTracking, setIsTracking] = useState(false)
   const cesiumViewerRef = useRef<CesiumViewerHandle>(null)
 
   const satellitesQuery = useSatellites()
@@ -65,6 +66,10 @@ function GlobePage() {
     [satellites],
   )
   const dataError = motion.error ?? satellitesQuery.error
+  const isGlobeLoading = motion.isPending || satellitesQuery.isPending
+  const loadingLabel = motion.isPending
+    ? 'Loading satellite motion'
+    : 'Loading satellite catalog'
 
   const selectedPositionDetail =
     selectedSatellite && motion.selectedDetail?.id === selectedSatellite.id
@@ -163,6 +168,10 @@ function GlobePage() {
               satellite={selectedSatellite}
               omm={motion.ommById.get(selectedSatellite.id) ?? null}
               position={selectedPositionDetail}
+              isTracking={isTracking}
+              onToggleTracking={() =>
+                cesiumViewerRef.current?.setTracking(!isTracking)
+              }
               onClose={() => {
                 setSelectedSatellite(null)
                 setQuery('')
@@ -176,17 +185,43 @@ function GlobePage() {
         motion={motion}
         selectedEntityId={selectedSatellite?.id ?? null}
         onSelectedEntityIdChange={handleSelectedEntityIdChange}
+        onTrackingChange={setIsTracking}
         className="h-full w-full"
       />
-      {(motion.isPending || satellitesQuery.isPending) && (
-        <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md border border-line-strong bg-void-600 px-3 py-2 text-sm text-ink-muted shadow-sm backdrop-blur">
-          {motion.isPending
-            ? 'Loading satellite motion...'
-            : 'Loading satellite catalog...'}
-        </p>
+      {isGlobeLoading && (
+        <div
+          className="absolute inset-0 z-20 flex items-center justify-center bg-void"
+          role="status"
+          aria-live="polite"
+          aria-label={loadingLabel}
+        >
+          <Transition
+            appear
+            show
+            enter="transition ease-out duration-500"
+            enterFrom="opacity-0 translate-y-3"
+            enterTo="opacity-100 translate-y-0"
+          >
+            <div className="flex flex-col items-center gap-10">
+              <img
+                src="/brand/lynx-logo.png"
+                alt=""
+                className="h-20 w-auto sm:h-24"
+                width={168}
+                height={44}
+                decoding="async"
+              />
+              <div
+                className="h-1 w-56 overflow-hidden bg-line-strong sm:w-64"
+                aria-hidden="true"
+              >
+                <div className="lynx-load-bar h-full w-1/3 bg-solar" />
+              </div>
+            </div>
+          </Transition>
+        </div>
       )}
-      {!motion.isPending &&
-        !satellitesQuery.isPending &&
+      {!isGlobeLoading &&
         satellites.length > 0 &&
         filteredSatellites.length === 0 && (
           <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md border border-line-strong bg-void-600 px-3 py-2 text-sm text-ink-muted shadow-sm backdrop-blur">

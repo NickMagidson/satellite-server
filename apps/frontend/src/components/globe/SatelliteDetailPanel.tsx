@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { LocateFixed, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { SatelliteMetadata } from '../../lib/satelliteApi'
 import { ORBIT_CLASS_LABELS } from '../../lib/satelliteApi'
@@ -12,6 +12,8 @@ interface SatelliteDetailPanelProps {
   satellite: SatelliteMetadata
   omm?: SatelliteOmmRecord | null
   position?: SelectedPositionDetail | null
+  isTracking: boolean
+  onToggleTracking: () => void
   onClose: () => void
 }
 
@@ -67,6 +69,8 @@ export default function SatelliteDetailPanel({
   satellite,
   omm,
   position,
+  isTracking,
+  onToggleTracking,
   onClose,
 }: SatelliteDetailPanelProps) {
   const inclinationDeg = omm?.INCLINATION ?? satellite.inclinationDeg
@@ -87,14 +91,31 @@ export default function SatelliteDetailPanel({
           </p> */}
         </div>
 
-        <button
-          type="button"
-          aria-label="Close satellite details"
-          onClick={onClose}
-          className="rounded-full p-1 text-ink-muted transition hover:bg-void-700 hover:text-object focus:outline-none focus-visible:ring-2 focus-visible:ring-solar/60"
-        >
-          <X className="size-4" aria-hidden="true" />
-        </button>
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            aria-label={
+              isTracking ? 'Stop tracking satellite' : 'Track satellite'
+            }
+            aria-pressed={isTracking}
+            title={isTracking ? 'Stop tracking' : 'Track satellite'}
+            disabled={!position}
+            onClick={onToggleTracking}
+            className={`rounded-full p-1 transition hover:bg-void-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-solar/60 disabled:cursor-not-allowed disabled:opacity-40 ${
+              isTracking ? 'text-solar' : 'text-ink-muted hover:text-object'
+            }`}
+          >
+            <LocateFixed className="size-4" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            aria-label="Close satellite details"
+            onClick={onClose}
+            className="rounded-full p-1 text-ink-muted transition hover:bg-void-700 hover:text-object focus:outline-none focus-visible:ring-2 focus-visible:ring-solar/60"
+          >
+            <X className="size-4" aria-hidden="true" />
+          </button>
+        </div>
       </CardHeader>
 
       <CardBody className="max-h-[min(70vh,calc(100dvh-6rem))] space-y-4 overflow-y-auto p-3">
@@ -111,6 +132,34 @@ export default function SatelliteDetailPanel({
             <DetailRow label="Object ID" value={satellite.objectId} />
             <DetailRow label="Launch date" value={satellite.launchDate} />
           </ReadoutList>
+        </section>
+
+        <section>
+          <h3 className="text-lg font-medium text-object">Current position</h3>
+          {position ? (
+            <ReadoutList>
+              <DetailRow
+                label="Latitude"
+                value={formatDegrees(position.geodetic.latitudeDeg, 3)}
+              />
+              <DetailRow
+                label="Longitude"
+                value={formatDegrees(position.geodetic.longitudeDeg, 3)}
+              />
+              <DetailRow
+                label="Altitude"
+                value={`${formatNumber(position.geodetic.altitudeKm)} km`}
+              />
+              <DetailRow
+                label="Propagated"
+                value={formatDate(position.propagatedAt)}
+              />
+            </ReadoutList>
+          ) : (
+            <p className="mt-2 text-sm text-ink-muted">
+              No current propagated position is visible for this satellite.
+            </p>
+          )}
         </section>
 
         <section>
@@ -178,34 +227,6 @@ export default function SatelliteDetailPanel({
               }
             />
           </ReadoutList>
-        </section>
-
-        <section>
-          <h3 className="text-lg font-medium text-object">Current position</h3>
-          {position ? (
-            <ReadoutList>
-              <DetailRow
-                label="Latitude"
-                value={formatDegrees(position.geodetic.latitudeDeg, 3)}
-              />
-              <DetailRow
-                label="Longitude"
-                value={formatDegrees(position.geodetic.longitudeDeg, 3)}
-              />
-              <DetailRow
-                label="Altitude"
-                value={`${formatNumber(position.geodetic.altitudeKm)} km`}
-              />
-              <DetailRow
-                label="Propagated"
-                value={formatDate(position.propagatedAt)}
-              />
-            </ReadoutList>
-          ) : (
-            <p className="mt-2 text-sm text-ink-muted">
-              No current propagated position is visible for this satellite.
-            </p>
-          )}
         </section>
       </CardBody>
     </Card>
