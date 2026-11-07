@@ -3,29 +3,37 @@ import compression from 'compression';
 import express, { type ErrorRequestHandler, type Express } from 'express';
 import { HttpError } from './errors.js';
 import { createSatelliteRouter } from './routes/satellites.routes.js';
+import { createChatRouter } from './routes/chat.routes.js';
+import type { ChatService } from './services/chatService.js';
 import type { SatelliteCatalog } from './services/satelliteCatalog.js';
 
 interface CreateAppOptions {
   catalog: SatelliteCatalog;
   databaseUrl: string | null;
   corsOrigin?: string;
+  chatEnabled?: boolean;
+  chatService?: ChatService | null;
 }
 
 export function createApp({
   catalog,
   databaseUrl,
   corsOrigin = 'http://localhost:5173',
+  chatEnabled = false,
+  chatService = null,
 }: CreateAppOptions): Express {
   const app = express();
 
   app.use(compression());
-  app.use(cors({
-    origin: corsOrigin,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Content-Range', 'X-Total-Count'],
-  }));
+  app.use(
+    cors({
+      origin: corsOrigin,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      exposedHeaders: ['Content-Range', 'X-Total-Count'],
+    }),
+  );
 
   app.use(express.json({ limit: '5mb' }));
 
@@ -40,6 +48,10 @@ export function createApp({
   });
 
   app.use('/api/satellites', createSatelliteRouter({ catalog, databaseUrl }));
+  app.use(
+    '/api/agent',
+    createChatRouter({ catalog, enabled: chatEnabled, service: chatService }),
+  );
 
   const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     if (res.headersSent) {

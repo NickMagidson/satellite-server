@@ -14,13 +14,16 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^4.0.109",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "ai": "^7.0.163",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "pg": "^8.21.0",
-    "satellite.js": "^7.0.1"
+    "satellite.js": "^7.0.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/compression": "^1.8.1",

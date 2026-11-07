@@ -34,6 +34,22 @@ For local host development, run the TypeScript source directly:
 npm run dev
 ```
 
+### Local Ask Lynx workspace
+
+The Ask Lynx chat and split globe workspace are opt-in for local development. Set these values in `.env` for `make dev`:
+
+```sh
+LYNX_CHAT_ENABLED=true
+VITE_LYNX_CHAT_ENABLED=true
+OPENAI_API_KEY=your-local-api-key
+OPENAI_MODEL=gpt-4.1-mini
+```
+
+Then run `make dev` and open `http://localhost:5173/`. For host development, supply the same variables to the API and Vite dev processes. The left pane uses assistant-ui; search, filters, selection, tracking, and globe controls still use the existing catalog and Cesium viewer. Ask “Show the ISS,” “Show LEO satellites,” or “Which satellite is selected?” The model can search catalog metadata and request validated globe actions. Current-position answers include the orbital-element epoch and age because old elements may be inaccurate. Ground-station access, passes, footprints, coverage, and radio contact are not computed yet.
+
+Both flags default to off. The chat endpoint is unavailable when `NODE_ENV=production`, even if credentials are set, and the production frontend keeps the existing globe view. Keep `OPENAI_API_KEY` on the API server; never use a `VITE_` prefix for it.
+Local host development binds the API to `127.0.0.1` when chat is enabled. The development Compose override binds the API and frontend ports to `127.0.0.1` on the host; it requires Docker Compose 2.24.4 or later for `!override`.
+
 Check types without emitting compiled files:
 
 ```sh
@@ -157,6 +173,7 @@ GET  /api/satellites/elements
 GET  /api/satellites/:id/position
 GET  /api/satellites/:id/position?at=2026-01-01T00:00:00Z
 POST /api/satellites/omms
+POST /api/agent/chat                 # local development only
 ```
 
 `GET /api/satellites` returns satellite metadata:

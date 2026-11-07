@@ -101,6 +101,7 @@ interface CesiumViewerInstance {
   selectedEntity: CesiumEntity | undefined
   trackedEntity: CesiumEntity | undefined
   trackedEntityChanged: CesiumEvent
+  resize: () => void
   destroy: () => void
   isDestroyed: () => boolean
 }
@@ -396,6 +397,7 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
       let removePreRender: (() => void) | null = null
       let removeCameraChanged: (() => void) | null = null
       let removeTrackedEntityChanged: (() => void) | null = null
+      let resizeObserver: ResizeObserver | null = null
 
       async function init() {
         ensureCesiumStylesheet()
@@ -428,6 +430,14 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
         })
         viewerRef.current = viewer
         cesiumApiRef.current = Cesium
+        if (typeof ResizeObserver !== 'undefined') {
+          resizeObserver = new ResizeObserver(() => {
+            if (viewer.isDestroyed()) return
+            viewer.resize()
+            viewer.scene.requestRender()
+          })
+          resizeObserver.observe(containerRef.current)
+        }
 
         homeViewRef.current = buildStartViewOptions(Cesium)
         applyStartView(viewer, homeViewRef.current)
@@ -640,6 +650,7 @@ const CesiumViewer = forwardRef<CesiumViewerHandle, CesiumViewerProps>(
         removePreRender?.()
         removeCameraChanged?.()
         removeTrackedEntityChanged?.()
+        resizeObserver?.disconnect()
         const viewer = viewerRef.current
         if (viewer && CesiumApi) {
           viewer.screenSpaceEventHandler.removeInputAction(

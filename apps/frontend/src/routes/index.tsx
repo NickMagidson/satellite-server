@@ -4,8 +4,10 @@ import { Home } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import CesiumViewer from '../components/CesiumViewer'
 import type { CesiumViewerHandle } from '../components/CesiumViewer'
+import ChatPanel from '../components/chat/ChatPanel'
 import SatelliteFilterPanel from '../components/filters/SatelliteFilterPanel'
 import SatelliteDetailPanel from '../components/globe/SatelliteDetailPanel'
+import GlobeWorkspaceShell from '../components/layout/GlobeWorkspaceShell'
 import SearchInput from '../components/search/SearchInput'
 import { useFilterState } from '../hooks/useFilterState'
 import { useSatelliteMotionWorker } from '../hooks/useSatelliteMotionWorker'
@@ -101,133 +103,171 @@ function GlobePage() {
     setQuery(satellite?.name ?? nameFromMotion)
   }
 
-  return (
-    <main className="globe-main relative w-full overflow-hidden bg-void">
-      <div className="absolute left-4 top-4 z-10 flex w-96 items-start gap-2">
-        <SearchInput
-          className="min-w-0 flex-1"
-          inputClassName="h-10 rounded-sm border-line-strong focus-visible:ring-solar/60"
-          panelClassName="z-30"
-          options={searchResults}
-          value={selectedSatellite}
-          onChange={(satellite) => {
-            setSelectedSatellite(satellite)
-            setQuery(satellite ? satellite.name : '')
-          }}
-          query={query}
-          onQueryChange={(nextQuery) => {
-            setQuery(nextQuery)
+  const chatEnabled =
+    import.meta.env.DEV && import.meta.env.VITE_LYNX_CHAT_ENABLED === 'true'
+  const controls = (
+    <>
+      <SearchInput
+        className="min-w-0 flex-1"
+        inputClassName="h-10 rounded-sm border-line-strong focus-visible:ring-solar/60"
+        panelClassName="z-30"
+        options={searchResults}
+        value={selectedSatellite}
+        onChange={(satellite) => {
+          setSelectedSatellite(satellite)
+          setQuery(satellite ? satellite.name : '')
+        }}
+        query={query}
+        onQueryChange={(nextQuery) => {
+          setQuery(nextQuery)
 
-            if (selectedSatellite && nextQuery !== selectedSatellite.name) {
-              setSelectedSatellite(null)
-            }
-          }}
-          getOptionLabel={(satellite) => satellite.name}
-          getOptionKey={(satellite) => satellite.id}
-          getOptionDescription={(satellite) =>
-            `NORAD ${satellite.noradCatId} · ${satellite.id}`
+          if (selectedSatellite && nextQuery !== selectedSatellite.name) {
+            setSelectedSatellite(null)
           }
-          placeholder="Search satellites..."
-        />
-        <SatelliteFilterPanel
-          filters={effectiveFilters}
-          options={filterOptions}
-          onChange={setFilters}
-          onReset={resetFilters}
-        />
-        <button
-          type="button"
-          onClick={() => cesiumViewerRef.current?.recenter()}
-          className="flex size-10 shrink-0 items-center justify-center rounded-sm border border-line-strong bg-void-600 text-object shadow-lg backdrop-blur transition hover:bg-void-700 hover:text-object focus:outline-none focus-visible:ring-2 focus-visible:ring-solar/60"
-          title="Re-center globe"
-          aria-label="Re-center globe"
-        >
-          <Home className="size-4" aria-hidden="true" />
-        </button>
-      </div>
-
-      {(motion.isError || satellitesQuery.isError) && (
-        <p className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-md border border-flare/40 bg-void-600 px-3 py-2 text-sm text-flare shadow-sm backdrop-blur">
-          {dataError instanceof Error
-            ? dataError.message
-            : 'Failed to load satellite data.'}
-        </p>
-      )}
-      <Transition
-        show={Boolean(selectedSatellite)}
-        enter="transition ease-out duration-200"
-        enterFrom="opacity-0 translate-x-4"
-        enterTo="opacity-100 translate-x-0"
-        leave="transition ease-in duration-150"
-        leaveFrom="opacity-100 translate-x-0"
-        leaveTo="opacity-0 translate-x-4"
-      >
-        <div className="absolute right-4 top-4 z-10 w-96 transform">
-          {selectedSatellite ? (
-            <SatelliteDetailPanel
-              satellite={selectedSatellite}
-              omm={motion.ommById.get(selectedSatellite.id) ?? null}
-              position={selectedPositionDetail}
-              isTracking={isTracking}
-              onToggleTracking={() =>
-                cesiumViewerRef.current?.setTracking(!isTracking)
-              }
-              onClose={() => {
-                setSelectedSatellite(null)
-                setQuery('')
-              }}
-            />
-          ) : null}
-        </div>
-      </Transition>
-      <CesiumViewer
-        ref={cesiumViewerRef}
-        motion={motion}
-        selectedEntityId={selectedSatellite?.id ?? null}
-        onSelectedEntityIdChange={handleSelectedEntityIdChange}
-        onTrackingChange={setIsTracking}
-        className="h-full w-full"
+        }}
+        getOptionLabel={(satellite) => satellite.name}
+        getOptionKey={(satellite) => satellite.id}
+        getOptionDescription={(satellite) =>
+          `NORAD ${satellite.noradCatId} · ${satellite.id}`
+        }
+        placeholder="Search satellites..."
       />
-      {isGlobeLoading && (
-        <div
-          className="absolute inset-0 z-20 flex items-center justify-center bg-void"
-          role="status"
-          aria-live="polite"
-          aria-label={loadingLabel}
-        >
-          <Transition
-            appear
-            show
-            enter="transition ease-out duration-500"
-            enterFrom="opacity-0 translate-y-3"
-            enterTo="opacity-100 translate-y-0"
-          >
-            <div className="flex flex-col items-center gap-10">
-              <img
-                src="/brand/lynx-logo.png"
-                alt=""
-                className="h-20 w-auto sm:h-24"
-                width={168}
-                height={44}
-                decoding="async"
+      <SatelliteFilterPanel
+        filters={effectiveFilters}
+        options={filterOptions}
+        onChange={setFilters}
+        onReset={resetFilters}
+      />
+    </>
+  )
+
+  return (
+    <GlobeWorkspaceShell
+      enabled={chatEnabled}
+      sidebar={
+        <div className="flex h-full flex-col">
+          <div className="flex shrink-0 items-start gap-2 border-b border-line p-4">
+            {controls}
+          </div>
+          <div className="min-h-0 flex-1">
+            {chatEnabled && (
+              <ChatPanel
+                satellites={satellites}
+                catalogReady={satellitesQuery.isSuccess}
+                selectedSatelliteId={selectedSatellite?.id ?? null}
+                filters={effectiveFilters}
+                onSelectSatellite={(id) => {
+                  const satellite = satellitesById.get(id)
+                  if (!satellite) return
+                  setSelectedSatellite(satellite)
+                  setQuery(satellite.name)
+                }}
+                onFiltersChange={setFilters}
               />
-              <div
-                className="h-1 w-56 overflow-hidden bg-line-strong sm:w-64"
-                aria-hidden="true"
-              >
-                <div className="lynx-load-bar h-full w-1/3 bg-solar" />
-              </div>
-            </div>
-          </Transition>
+            )}
+          </div>
         </div>
-      )}
-      {!isGlobeLoading &&
-        satellites.length > 0 &&
-        filteredSatellites.length === 0 && (
-          <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md border border-line-strong bg-void-600 px-3 py-2 text-sm text-ink-muted shadow-sm backdrop-blur">
-            No satellites match these filters.
+      }
+    >
+      <main className="globe-main relative w-full overflow-hidden bg-void">
+        <div
+          className={`absolute top-4 z-10 flex items-start gap-2 ${chatEnabled ? 'left-16' : 'left-4 w-96'}`}
+        >
+          {!chatEnabled && controls}
+          <button
+            type="button"
+            onClick={() => cesiumViewerRef.current?.recenter()}
+            className="flex size-10 shrink-0 items-center justify-center rounded-sm border border-line-strong bg-void-600 text-object shadow-lg backdrop-blur transition hover:bg-void-700 hover:text-object focus:outline-none focus-visible:ring-2 focus-visible:ring-solar/60"
+            title="Re-center globe"
+            aria-label="Re-center globe"
+          >
+            <Home className="size-4" aria-hidden="true" />
+          </button>
+        </div>
+
+        {(motion.isError || satellitesQuery.isError) && (
+          <p className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-md border border-flare/40 bg-void-600 px-3 py-2 text-sm text-flare shadow-sm backdrop-blur">
+            {dataError instanceof Error
+              ? dataError.message
+              : 'Failed to load satellite data.'}
           </p>
         )}
-    </main>
+        <Transition
+          show={Boolean(selectedSatellite)}
+          enter="transition ease-out duration-200"
+          enterFrom="opacity-0 translate-x-4"
+          enterTo="opacity-100 translate-x-0"
+          leave="transition ease-in duration-150"
+          leaveFrom="opacity-100 translate-x-0"
+          leaveTo="opacity-0 translate-x-4"
+        >
+          <div className="absolute right-4 top-4 z-10 w-96 transform">
+            {selectedSatellite ? (
+              <SatelliteDetailPanel
+                satellite={selectedSatellite}
+                omm={motion.ommById.get(selectedSatellite.id) ?? null}
+                position={selectedPositionDetail}
+                isTracking={isTracking}
+                onToggleTracking={() =>
+                  cesiumViewerRef.current?.setTracking(!isTracking)
+                }
+                onClose={() => {
+                  setSelectedSatellite(null)
+                  setQuery('')
+                }}
+              />
+            ) : null}
+          </div>
+        </Transition>
+        <CesiumViewer
+          ref={cesiumViewerRef}
+          motion={motion}
+          selectedEntityId={selectedSatellite?.id ?? null}
+          onSelectedEntityIdChange={handleSelectedEntityIdChange}
+          onTrackingChange={setIsTracking}
+          className="h-full w-full"
+        />
+        {isGlobeLoading && (
+          <div
+            className="absolute inset-0 z-20 flex items-center justify-center bg-void"
+            role="status"
+            aria-live="polite"
+            aria-label={loadingLabel}
+          >
+            <Transition
+              appear
+              show
+              enter="transition ease-out duration-500"
+              enterFrom="opacity-0 translate-y-3"
+              enterTo="opacity-100 translate-y-0"
+            >
+              <div className="flex flex-col items-center gap-10">
+                <img
+                  src="/brand/lynx-logo.png"
+                  alt=""
+                  className="h-20 w-auto sm:h-24"
+                  width={168}
+                  height={44}
+                  decoding="async"
+                />
+                <div
+                  className="h-1 w-56 overflow-hidden bg-line-strong sm:w-64"
+                  aria-hidden="true"
+                >
+                  <div className="lynx-load-bar h-full w-1/3 bg-solar" />
+                </div>
+              </div>
+            </Transition>
+          </div>
+        )}
+        {!isGlobeLoading &&
+          satellites.length > 0 &&
+          filteredSatellites.length === 0 && (
+            <p className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-md border border-line-strong bg-void-600 px-3 py-2 text-sm text-ink-muted shadow-sm backdrop-blur">
+              No satellites match these filters.
+            </p>
+          )}
+      </main>
+    </GlobeWorkspaceShell>
   )
 }

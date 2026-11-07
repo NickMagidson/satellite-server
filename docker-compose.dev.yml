@@ -5,8 +5,14 @@ services:
     command: sh -c "npm install && npm --workspace apps/api run dev"
     environment:
       NODE_ENV: development
-    ports:
-      - "${PRISMA_STUDIO_PORT:-5555}:5555"
+      LYNX_CHAT_ENABLED: ${LYNX_CHAT_ENABLED:-false}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-}
+      API_BIND_HOST: 0.0.0.0
+    # Override the production port mapping; opt-in local AI must stay on loopback.
+    ports: !override
+      - "127.0.0.1:${PORT:-3000}:${PORT:-3000}"
+      - "127.0.0.1:${PRISMA_STUDIO_PORT:-5555}:5555"
     volumes:
       - .:/app
       - node-modules:/app/node_modules
@@ -24,8 +30,9 @@ services:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
       VITE_CESIUM_ION_ACCESS_TOKEN: ${VITE_CESIUM_ION_ACCESS_TOKEN:-}
       VITE_SATELLITE_PERF_LOGS: ${VITE_SATELLITE_PERF_LOGS:-true}
-    ports:
-      - "${FRONTEND_PORT:-5173}:5173"
+      VITE_LYNX_CHAT_ENABLED: ${VITE_LYNX_CHAT_ENABLED:-false}
+    ports: !override
+      - "127.0.0.1:${FRONTEND_PORT:-5173}:5173"
     volumes:
       - .:/app
       - node-modules:/app/node_modules

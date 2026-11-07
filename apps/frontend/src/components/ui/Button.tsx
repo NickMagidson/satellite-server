@@ -1,4 +1,5 @@
-import { Link, type LinkComponentProps } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
+import type { LinkComponentProps } from '@tanstack/react-router'
 import type { ComponentPropsWithoutRef } from 'react'
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'ink'

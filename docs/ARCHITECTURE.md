@@ -27,8 +27,8 @@ Express HTTP server. Entry: `src/server.ts` → `createApp()` in `src/app.ts`.
 
 | Directory | Responsibility |
 |-----------|----------------|
-| `src/routes/` | Express routers (`satellites.routes.ts`) |
-| `src/services/` | `SatelliteCatalog`, propagation, OMM load/store |
+| `src/routes/` | Express routers (`satellites.routes.ts`, local-only `chat.routes.ts`) |
+| `src/services/` | `SatelliteCatalog`, propagation, OMM load/store, chat catalog tools and model service |
 | `src/validation/` | OMM parse and normalize (`ommValidation.ts`) |
 | `src/utils/` | Time parsing, JSON file read |
 | `src/test/` | `createTestApp`, fixtures for route tests |
@@ -43,7 +43,7 @@ Express HTTP server. Entry: `src/server.ts` → `createApp()` in `src/app.ts`.
 
 **Dev server:** `npm run dev` uses `tsx watch src/server.ts` (TypeScript direct, no compile step).
 
-**Config** (`src/config.ts`): `PORT`, `OMM_FILE`, `UPDATE_INTERVAL_MS`, `DATABASE_URL`, `CORS_ORIGIN`.
+**Config** (`src/config.ts`): `PORT`, `OMM_FILE`, `UPDATE_INTERVAL_MS`, `DATABASE_URL`, `CORS_ORIGIN`, and local-only chat settings.
 
 ### `apps/frontend`
 
@@ -52,7 +52,7 @@ TanStack Start + React 19 + Vite + Tailwind 4 + Cesium.
 | Directory | Responsibility |
 |-----------|----------------|
 | `src/routes/` | File-based TanStack Router (`/` — globe page) |
-| `src/components/` | CesiumViewer, SearchInput, SatelliteDetailPanel |
+| `src/components/` | CesiumViewer, SearchInput, SatelliteDetailPanel, assistant-ui ChatPanel and split workspace shell |
 | `src/hooks/` | `useSatelliteMotionWorker`, `useSatellites`, `useSatelliteSearch` (`useSatellitePositions` for REST consumers) |
 | `src/lib/` | `satelliteApi.ts`, `satelliteMotion/` buffer layout + extrapolation |
 | `src/workers/` | `satelliteMotion.worker.ts` — tiered SGP4 into transferable buffers |
@@ -63,6 +63,9 @@ TanStack Start + React 19 + Vite + Tailwind 4 + Cesium.
 **API base URL:** `import.meta.env.VITE_API_URL` (default `http://localhost:3000`).
 
 **Cesium:** `cesium` is a dependency of `apps/frontend` but assets are served from hoisted `node_modules/cesium/Build/Cesium` at the repo root (workspace install). The viewer loads **`/cesium/Cesium.js` via dynamic script tag** (see `CesiumViewer.tsx`), not a static `import 'cesium'`. Vite plugin `cesiumAssetsPlugin` serves assets in dev and copies them on build. Ion token via `VITE_CESIUM_ION_ACCESS_TOKEN`.
+
+**Ask Lynx:** In Vite development with `VITE_LYNX_CHAT_ENABLED=true`, `/` adds an assistant-ui pane beside the existing mounted globe. `GlobePage` owns shared catalog, filters, selection, and viewer state. The assistant-ui local runtime calls the Express JSON endpoint using `VITE_API_URL`; the browser applies only scene actions that still match its loaded catalog. The API validates history and context, runs an OpenAI tool loop over fixed catalog operations, and propagates individual positions on demand. The server reports element age and refuses unimplemented access/pass/footprint calculations. The route requires `LYNX_CHAT_ENABLED=true` and is absent in production. No chat history is stored.
+In local host development, enabling chat binds the API to loopback by default. The dev Compose override uses `!override` to replace the production port mapping with loopback-only host ports; inside its container the API still listens on all interfaces.
 
 ### `packages/db`
 
@@ -116,6 +119,7 @@ Consumed by the API through `@prisma/client` in `ommRecordStore.ts`. No build st
 | `GET` | `/api/satellites/:id/position` | Single `SatellitePosition` object (live cache) |
 | `GET` | `/api/satellites/:id/position?at=<ISO>` | Single position propagated at timestamp |
 | `POST` | `/api/satellites/omms` | Replace active OMM set (**202 Accepted** + snapshot) |
+| `POST` | `/api/agent/chat` | Local-only model chat, catalog tools, and validated scene actions |
 
 **Route ordering:** `/positions` and `/elements` are registered before `/:id/position` so those path segments are not captured as an id.
 
@@ -131,10 +135,14 @@ Errors: `HttpError` / `ValidationError` → JSON `{ error, details? }` with appr
 | `LIVE_POSITION_REFRESH_ENABLED` | `true` (host); Compose defaults `false` | API live position cache tick |
 | `DATABASE_URL` | unset (optional) | Prisma / Postgres; enables persistence |
 | `CORS_ORIGIN` | `http://localhost:5173` | Allowed browser origin for API CORS |
+| `LYNX_CHAT_ENABLED` | `false` | Enable chat API only outside production |
+| `OPENAI_API_KEY` | unset | Server-only model credential for local chat |
+| `OPENAI_MODEL` | unset | Tool-capable OpenAI model name for local chat |
 | `POSTGRES_USER` | `satellite` | Compose Postgres user |
 | `POSTGRES_PASSWORD` | `satellite` | Compose Postgres password — change for production |
 | `POSTGRES_DB` | `satellite` | Compose Postgres database name |
 | `VITE_API_URL` | `http://localhost:3000` | Frontend → API base URL |
+| `VITE_LYNX_CHAT_ENABLED` | `false` | Enable split chat workspace in Vite development |
 | `VITE_CESIUM_ION_ACCESS_TOKEN` | unset | Cesium Ion imagery/terrain |
 | `FRONTEND_PORT` | `5173` | Docker dev frontend port |
 | `PRISMA_STUDIO_PORT` | `5555` | Prisma Studio (via `make studio`) |
